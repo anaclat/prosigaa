@@ -30,5 +30,5 @@ Backend: Java (Spring Boot).
 Banco de Dados: H2 (No MVP).
 
 Diagrama UML para discussão com os colegas em sala.
-<img width="892" height="1353" alt="backend drawio" src="https://github.com/user-attachments/assets/9ba8065f-cb4d-4b62-9923-34270c60ee0c" />
+<img width="659" height="952" alt="backend drawio" src="https://github.com/user-attachments/assets/515cf293-6d3b-461d-9256-0198380025e7" />
 
