@@ -8,11 +8,15 @@ import jakarta.persistence.Id;
 @Entity
 public class Fase {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
     private int numero;
+
+    // Required by JPA/Hibernate specification
+    protected Fase() {
+    }
 
     public Fase(String nome, int numero) {
         this.nome = nome;
