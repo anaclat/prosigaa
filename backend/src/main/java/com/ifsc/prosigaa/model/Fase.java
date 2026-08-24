@@ -1,9 +1,8 @@
 package com.ifsc.prosigaa.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
 
 @Entity
 public class Fase {
@@ -13,6 +12,12 @@ public class Fase {
 
     private String nome;
     private int numero;
+
+    @ManyToOne
+    private ArrayList<Materia> materias;
+
+    @ManyToOne
+    private ArrayList<Postagem> postagems;
 
     // Required by JPA/Hibernate specification
     protected Fase() {

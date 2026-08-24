@@ -1,9 +1,6 @@
 package com.ifsc.prosigaa.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Materia {
@@ -13,6 +10,9 @@ public class Materia {
 
     private String nome;
     private String codigo;
+
+    @OneToMany
+    private Fase fase;
 
     protected Materia() {
     }

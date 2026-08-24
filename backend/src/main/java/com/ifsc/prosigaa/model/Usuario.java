@@ -1,9 +1,9 @@
 package com.ifsc.prosigaa.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.ifsc.prosigaa.enums.TipoUsuario;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
 
 @Entity
 public class Usuario {
@@ -14,7 +14,19 @@ public class Usuario {
     private String nome;
     private String email;
     private String senhaHash;
+    private TipoUsuario tipoUsuario;
 
+    @ManyToOne
+    private ArrayList<CurtidaComentario> curtidaComentarios;
+
+    @ManyToOne
+    private ArrayList<CurtidaPostagem> curtidaPostagems;
+
+    @ManyToOne
+    private ArrayList<Comentario> comentarios;
+
+    @ManyToOne
+    private ArrayList<Postagem> postagems;
 
     protected Usuario() {
     }
