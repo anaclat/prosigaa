@@ -1,4 +1,3 @@
 package com.ifsc.prosigaa.dto;
 
-public record CadastroFaseDTO(String nome, int numero) {
-}
+public record CadastroFaseDTO(String nome, int numero) {}

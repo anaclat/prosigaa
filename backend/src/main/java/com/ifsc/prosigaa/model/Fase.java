@@ -3,6 +3,7 @@ package com.ifsc.prosigaa.model;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Fase {
@@ -13,36 +14,26 @@ public class Fase {
     private String nome;
     private int numero;
 
-    @ManyToOne
-    private ArrayList<Materia> materias;
+    @ManyToMany
+    @JoinTable(
+        name = "fase_materia",
+        joinColumns = @JoinColumn(name = "fase_id"),
+        inverseJoinColumns = @JoinColumn(name = "materia_id")
+    )
+    private List<Materia> materias = new ArrayList<>();
 
-    @ManyToOne
-    private ArrayList<Postagem> postagems;
+    @OneToMany(mappedBy = "fase")
+    private List<Postagem> postagens = new ArrayList<>();
 
-    // Required by JPA/Hibernate specification
-    protected Fase() {
-    }
+    protected Fase() {}
 
     public Fase(String nome, int numero) {
         this.nome = nome;
         this.numero = numero;
     }
 
-    public Fase(Long id, int numero, String nome) {
-        this.id = id;
-        this.numero = numero;
-        this.nome = nome;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public int getNumero() {
-        return numero;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
+    public int getNumero() { return numero; }
+    public List<Materia> getMaterias() { return materias; }
 }

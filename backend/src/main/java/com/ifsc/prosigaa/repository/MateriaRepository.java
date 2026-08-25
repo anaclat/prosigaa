@@ -1,7 +1,10 @@
 package com.ifsc.prosigaa.repository;
 
 import com.ifsc.prosigaa.model.Materia;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MateriaRepository extends CrudRepository<Materia, Long> {
+import java.util.List;
+
+public interface MateriaRepository extends JpaRepository<Materia, Long> {
+    List<Materia> findByFasesId(Long faseId);
 }

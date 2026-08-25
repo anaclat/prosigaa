@@ -1,10 +1,13 @@
 package com.ifsc.prosigaa.service;
 
+import com.ifsc.prosigaa.dto.FaseDTO;
+import com.ifsc.prosigaa.dto.FasesDTO;
+import com.ifsc.prosigaa.dto.MateriaDTO;
 import com.ifsc.prosigaa.model.Fase;
 import com.ifsc.prosigaa.repository.FaseRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class FaseService {
@@ -14,13 +17,24 @@ public class FaseService {
         this.faseRepository = faseRepository;
     }
 
-    public ArrayList<Fase> listarFases() {
-        return (ArrayList<Fase>) faseRepository.findAll();
+    public FasesDTO listar() {
+        List<FaseDTO> fases = faseRepository.findAll().stream()
+                .map(f -> new FaseDTO(
+                        f.getId(), f.getNome(), f.getNumero(),
+                        f.getMaterias().stream()
+                                .map(m -> new MateriaDTO(m.getId(), m.getNome(), m.getCodigo()))
+                                .toList()
+                ))
+                .toList();
+        return new FasesDTO(fases);
     }
 
-    public Fase cadastrarFase(String nome, int numero) {
-        Fase fase = new Fase(nome, numero);
-        faseRepository.save(fase);
-        return fase;
+    public Fase buscar(Long id) {
+        return faseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Fase não encontrada."));
+    }
+
+    public Fase cadastrar(String nome, int numero) {
+        return faseRepository.save(new Fase(nome, numero));
     }
 }

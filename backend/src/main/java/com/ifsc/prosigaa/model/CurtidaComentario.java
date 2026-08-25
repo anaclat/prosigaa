@@ -12,12 +12,22 @@ public class CurtidaComentario {
 
     private LocalDateTime criadoEm;
 
-    @OneToMany
+    @ManyToOne(optional = false)
     private Usuario usuario;
 
-    @OneToMany
+    @ManyToOne(optional = false)
     private Comentario comentario;
 
-    public CurtidaComentario() {
+    protected CurtidaComentario() {}
+
+    public CurtidaComentario(Usuario usuario, Comentario comentario) {
+        this.usuario = usuario;
+        this.comentario = comentario;
+        this.criadoEm = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public LocalDateTime getCriadoEm() { return criadoEm; }
+    public Usuario getUsuario() { return usuario; }
+    public Comentario getComentario() { return comentario; }
 }
