@@ -34,7 +34,7 @@ Através de postagens comentadas e categorizadas por **Fase** e **Matéria**, os
 * **`[RF05]` Sistema de Comentários:** Seção inferior em cada postagem para inserção de comentários em texto simples.
 * **`[RF06]` Destaque de Autoridade:** Identificação e destaque visual automático em comentários feitos por Professores.
 
-### 🛡️ Requisitos Não-Funcionais (RNF)
+###  Requisitos Não-Funcionais (RNF)
 * **`[RNF01]` Performance Backend:** Rotas e filtros otimizados para rápida resposta em Java Spring Boot.
 * **`[RNF02]` Usabilidade:** Interface fluida, responsiva e focada na facilidade de navegação do estudante.
 * **`[RNF03]` Persistência Leve (MVP):** Armazenamento em memória com H2 Database para facilitar a execução local e testes rápidos.
@@ -74,6 +74,18 @@ Para orientar o desenvolvimento da camada de modelo do backend, elaboramos o Dia
 | **Sessão de Comentários** | `[RF05]`, `[RF06]` | Área inferior da postagem com campo de resposta e badge/cor diferenciada para Professores. |
 
 ---
+
+##  Documentação Interativa da API (Swagger)
+
+A API do **ProSigaa** conta com documentação interativa gerada automaticamente via **Springdoc OpenAPI (Swagger UI)**. Através dela, é possível visualizar todas as rotas ativas, analisar a estrutura dos DTOs e testar requisições em tempo real.
+
+###  Como Acessar
+
+1. Certifique-se de que a aplicação backend está rodando localmente com o comando:
+   ```bash
+   ./gradlew bootRun
+Abra o seu navegador e acesse a URL:
+ http://localhost:8080/swagger-ui/index.html
 
 ##  Tecnologias Utilizadas
 
