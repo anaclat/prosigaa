@@ -564,6 +564,28 @@ body[data-theme='dark'] .hero-copy h1 {
   margin-top: 18px;
 }
 
+.inline-action,
+.comment-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inline-action.active,
+.comment-action.active {
+  background: rgba(61, 102, 245, 0.12);
+  border-color: rgba(61, 102, 245, 0.32);
+  color: var(--primary-strong);
+}
+
 .ghost-button.small-link {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.1);
@@ -689,6 +711,12 @@ body[data-theme='dark'] .hero-copy h1 {
   line-height: 1.7;
 }
 
+.comment-thread-footer {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
 .badge-verified {
   display: inline-flex;
   align-items: center;
@@ -755,11 +783,20 @@ body[data-theme='dark'] .hero-copy h1 {
   font-size: 1.1rem;
 }
 
-.curriculum-strip {
+.curriculum-sidebar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
-  margin: 0 0 24px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 16px;
+  box-shadow: 0 12px 20px var(--shadow);
+}
+
+.curriculum-sidebar h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: -0.04em;
 }
 
 .curriculum-card {
@@ -768,6 +805,10 @@ body[data-theme='dark'] .hero-copy h1 {
   border-radius: 16px;
   padding: 16px 14px;
   box-shadow: 0 12px 20px var(--shadow);
+}
+
+.sidebar-card {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .curriculum-card span {

@@ -31,11 +31,14 @@ function normalizePost(post: BackendPostDTO): ForumPost {
         minute: '2-digit',
       }),
       isProfessor: comment.usuario?.tipo === 'PROFESSOR',
+      liked: false,
+      likes: 0,
     })),
     phase: post.fase?.nome || 'Fase',
     phaseId: post.fase?.id,
     subject: post.materia?.nome || 'Matéria',
     subjectId: post.materia?.id,
+    liked: false,
   }
 }
 

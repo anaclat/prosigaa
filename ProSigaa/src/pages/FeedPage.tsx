@@ -124,19 +124,6 @@ export function FeedPage() {
             </div>
           )}
 
-          <div className="curriculum-strip">
-            {curriculumPeriods.map((period) => (
-              <div key={period.id} className="curriculum-card">
-                <span>{period.nome}</span>
-                <ul>
-                  {period.disciplinas.map((disciplina) => (
-                    <li key={disciplina}>{disciplina}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
           <div className="post-list">
             {visiblePosts.length === 0 ? (
               <div className="empty-state">Nenhuma conversa encontrada para os filtros selecionados.</div>
@@ -154,6 +141,20 @@ export function FeedPage() {
         </div>
 
         <aside className="feed-right-column">
+          <div className="curriculum-sidebar">
+            <h3>Estrutura curricular</h3>
+            {curriculumPeriods.map((period) => (
+              <div key={period.id} className="curriculum-card sidebar-card">
+                <span>{period.nome}</span>
+                <ul>
+                  {period.disciplinas.map((disciplina) => (
+                    <li key={disciplina}>{disciplina}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
           {selectedPost ? (
             <ConversationPanel post={selectedPost} onClose={() => setSelectedPost(null)} onSubmitComment={handleCommentSubmit} />
           ) : (

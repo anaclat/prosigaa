@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import type { ForumPost } from '../../interfaces/forum'
+import { useEffect, useMemo, useState } from 'react'
+import type { Comment, ForumPost } from '../../interfaces/forum'
 
 interface ConversationPanelProps {
   post: ForumPost
@@ -10,8 +10,25 @@ interface ConversationPanelProps {
 export function ConversationPanel({ post, onClose, onSubmitComment }: ConversationPanelProps) {
   const [draft, setDraft] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [commentReactions, setCommentReactions] = useState<Record<string, { liked: boolean; likes: number }>>({})
 
   const visibleComments = useMemo(() => post.comments ?? [], [post.comments])
+
+  useEffect(() => {
+    setCommentReactions((current) => {
+      const nextState: Record<string, { liked: boolean; likes: number }> = { ...current }
+
+      visibleComments.forEach((comment) => {
+        const previous = current[comment.id]
+        nextState[comment.id] = {
+          liked: previous?.liked ?? Boolean(comment.liked),
+          likes: previous?.likes ?? Number(comment.likes ?? 0),
+        }
+      })
+
+      return nextState
+    })
+  }, [visibleComments])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -24,6 +41,24 @@ export function ConversationPanel({ post, onClose, onSubmitComment }: Conversati
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleCommentLikeToggle = (comment: Comment) => {
+    setCommentReactions((current) => {
+      const existing = current[comment.id] ?? {
+        liked: Boolean(comment.liked),
+        likes: Number(comment.likes ?? 0),
+      }
+
+      const nextLiked = !existing.liked
+      return {
+        ...current,
+        [comment.id]: {
+          liked: nextLiked,
+          likes: Math.max(0, existing.likes + (nextLiked ? 1 : -1)),
+        },
+      }
+    })
   }
 
   return (
@@ -44,18 +79,33 @@ export function ConversationPanel({ post, onClose, onSubmitComment }: Conversati
         {visibleComments.length === 0 ? (
           <div className="empty-conversation">Ainda não há respostas nesta conversa.</div>
         ) : (
-          visibleComments.map((comment) => (
-            <div key={comment.id} className={`comment-thread-item ${comment.isProfessor ? 'professor' : ''}`}>
-              <div className="comment-avatar-badge">{comment.author.slice(0, 1).toUpperCase()}</div>
-              <div className="comment-thread-body">
-                <div className="comment-thread-header">
-                  <strong>{comment.author}</strong>
-                  {comment.isProfessor && <span className="badge-verified">Professor</span>}
+          visibleComments.map((comment) => {
+            const reaction = commentReactions[comment.id] ?? {
+              liked: Boolean(comment.liked),
+              likes: Number(comment.likes ?? 0),
+            }
+            return (
+              <div key={comment.id} className={`comment-thread-item ${comment.isProfessor ? 'professor' : ''}`}>
+                <div className="comment-avatar-badge">{comment.author.slice(0, 1).toUpperCase()}</div>
+                <div className="comment-thread-body">
+                  <div className="comment-thread-header">
+                    <strong>{comment.author}</strong>
+                    {comment.isProfessor && <span className="badge-verified">Professor</span>}
+                  </div>
+                  <p>{comment.message}</p>
+                  <div className="comment-thread-footer">
+                    <button
+                      type="button"
+                      className={`comment-action ${reaction.liked ? 'active' : ''}`}
+                      onClick={() => handleCommentLikeToggle(comment)}
+                    >
+                      {reaction.liked ? 'Curtido' : 'Curtir'} · {reaction.likes}
+                    </button>
+                  </div>
                 </div>
-                <p>{comment.message}</p>
               </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 

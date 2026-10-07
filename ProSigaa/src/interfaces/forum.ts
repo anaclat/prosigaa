@@ -9,6 +9,8 @@ export interface Comment {
   time: string
   isProfessor?: boolean
   accent?: 'primary' | 'neutral'
+  liked?: boolean
+  likes?: number
 }
 
 export interface ForumMateria {
@@ -38,6 +40,7 @@ export interface ForumPost {
   phaseId?: number
   subject: string
   subjectId?: number
+  liked?: boolean
 }
 
 export interface ThemeContextValue {
