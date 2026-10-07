@@ -23,12 +23,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.h2database:h2'
 
-    // Lombok (para getters, setters e construtores)
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-
     // Ferramentas de Desenvolvimento
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

@@ -1,12 +1,18 @@
-import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { AppProvider } from './context/AppContext'
+import { LandingPage } from './pages/LandingPage'
+import { FeedPage } from './pages/FeedPage'
+import { CommentsPage } from './pages/CommentsPage'
 
 function App() {
   return (
-    <div className="container mt-5 text-center">
-      <h1 className="text-primary">ServiceHub</h1>
-      <p className="lead">Projeto iniciado com Vite, React 19, TypeScript e Bootstrap!</p>
-      <button className="btn btn-success">Bootstrap funcionando</button>
-    </div>
+    <AppProvider>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/comentarios/:postId" element={<CommentsPage />} />
+      </Routes>
+    </AppProvider>
   )
 }
 
