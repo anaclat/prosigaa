@@ -14,9 +14,7 @@ Uma ferramenta de IA generativa foi utilizada como apoio para inspecionar a estr
 
 ## Integrantes e revisão
 
-| Integrante | Partes de autoria própria | Partes revisadas/validadas |
-|---|---|---|
-| Preencher pela equipe | Preencher | Preencher |
-| Preencher pela equipe | Preencher | Preencher |
-
-Não declare como testado ou validado algo que não tenha sido efetivamente executado. Se a equipe alterar o código sugerido por IA, registre a alteração e a participação correspondente.
+| Integrante | Partes de autoria própria                                  | Partes revisadas/validadas     |
+|------------|------------------------------------------------------------|--------------------------------|
+| João       | Criação de controllers, services e models                  | Documentação                   |
+| Leonardo   | Testes unitários, documentação, correção de erros, Swagger | Testes unitários, documentação |
