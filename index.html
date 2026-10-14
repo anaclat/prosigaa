@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste STOMP WebSocket</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+</head>
+<body>
+    <h2>Teste de WebSocket ProSIGAA</h2>
+    <p>ID do usuário (como se fosse você):
+        <input type="number" id="userId" value="1" />
+    </p>
+    <button onclick="conectar()">1. Conectar como este usuário</button>
+    <button onclick="enviarTeste()">2. Enviar teste para este usuário</button>
+    <div id="status" style="margin-top: 10px; color: blue;">Aguardando conexão...</div>
+    <ul id="mensagens" style="border: 1px solid #ccc; padding: 10px; min-height: 100px;"></ul>
+
+    <script>
+        let client = null;
+
+        function adicionarMensagem(texto) {
+            const lista = document.getElementById('mensagens');
+            const li = document.createElement('li');
+            li.textContent = texto;
+            lista.appendChild(li);
+        }
+
+        function conectar() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                document.getElementById('status').innerText = 'Informe o ID do usuário antes de conectar.';
+                return;
+            }
+
+            document.getElementById('status').innerText = 'Conectando como usuário ' + userId + '...';
+
+            client = new window.StompJs.Client({
+                webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+                debug: (str) => console.log(str),
+                reconnectDelay: 5000,
+                onConnect: () => {
+                    document.getElementById('status').innerText = 'Conectado como usuário ' + userId + '. Aguardando notificações...';
+
+                    client.subscribe('/user/' + userId + '/queue/notifications', (mensagem) => {
+                        const payload = JSON.parse(mensagem.body);
+                        adicionarMensagem('Notificação privada recebida: ' + payload.mensagem);
+                    });
+                },
+                onStompError: (frame) => {
+                    document.getElementById('status').innerText = 'Erro no STOMP: ' + frame.headers['message'];
+                },
+                onWebSocketError: (event) => {
+                    document.getElementById('status').innerText = 'Erro ao abrir WebSocket. Verifique se o backend está rodando em http://localhost:8080';
+                    console.error(event);
+                }
+            });
+
+            client.activate();
+        }
+
+        function enviarTeste() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                document.getElementById('status').innerText = 'Informe o ID antes de enviar a notificação de teste.';
+                return;
+            }
+
+            if (!client || !client.connected) {
+                document.getElementById('status').innerText = 'Primeiro conecte-se ao WebSocket.';
+                return;
+            }
+
+            fetch('http://localhost:8080/api/test/notify?userId=' + userId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mensagem: 'Teste de notificação para o usuário ' + userId })
+            })
+            .then(async (response) => {
+                const texto = await response.text();
+                if (!response.ok) {
+                    throw new Error(texto || 'Erro ao enviar teste');
+                }
+                adicionarMensagem('Teste enviado para o usuário ' + userId);
+            })
+            .catch((erro) => {
+                console.error(erro);
+                document.getElementById('status').innerText = 'Falha ao enviar teste: ' + erro.message;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -12,13 +12,16 @@ public class ComentarioService {
     private final ComentarioRepository comentarioRepository;
     private final UsuarioService usuarioService;
     private final PostagemService postagemService;
+    private final NotificacaoService notificacaoService;
 
     public ComentarioService(ComentarioRepository comentarioRepository,
                              UsuarioService usuarioService,
-                             PostagemService postagemService) {
+                             PostagemService postagemService,
+                             NotificacaoService notificacaoService) {
         this.comentarioRepository = comentarioRepository;
         this.usuarioService = usuarioService;
         this.postagemService = postagemService;
+        this.notificacaoService = notificacaoService;
     }
 
     public Comentario cadastrar(Long postagemId, CadastroComentarioDTO dto) {
@@ -31,6 +34,16 @@ public class ComentarioService {
 
         Comentario comentario = new Comentario(dto.conteudo(), usuario, postagem);
         postagem.adicionarComentario(comentario);
-        return comentarioRepository.save(comentario);
+        comentarioRepository.save(comentario);
+
+        if (!postagem.getUsuario().getId().equals(usuario.getId())) {
+            notificacaoService.notificarNovoComentario(
+                    postagem.getUsuario().getId(),
+                    postagem.getId(),
+                    usuario.getNome()
+            );
+        }
+
+        return comentario;
     }
 }

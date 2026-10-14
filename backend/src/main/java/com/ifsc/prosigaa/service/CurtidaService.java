@@ -11,17 +11,20 @@ public class CurtidaService {
     private final UsuarioService usuarioService;
     private final PostagemService postagemService;
     private final ComentarioRepository comentarioRepository;
+    private final NotificacaoService notificacaoService;
 
     public CurtidaService(CurtidaPostagemRepository curtidaPostagemRepository,
                           CurtidaComentarioRepository curtidaComentarioRepository,
                           UsuarioService usuarioService,
                           PostagemService postagemService,
-                          ComentarioRepository comentarioRepository) {
+                          ComentarioRepository comentarioRepository,
+                          NotificacaoService notificacaoService) {
         this.curtidaPostagemRepository = curtidaPostagemRepository;
         this.curtidaComentarioRepository = curtidaComentarioRepository;
         this.usuarioService = usuarioService;
         this.postagemService = postagemService;
         this.comentarioRepository = comentarioRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     public void curtirPostagem(Long postagemId, Long usuarioId) {
@@ -29,6 +32,14 @@ public class CurtidaService {
         Usuario usuario = usuarioService.buscar(usuarioId);
         Postagem postagem = postagemService.buscar(postagemId);
         curtidaPostagemRepository.save(new CurtidaPostagem(usuario, postagem));
+
+        if (!postagem.getUsuario().getId().equals(usuario.getId())) {
+            notificacaoService.notificarCurtidaPostagem(
+                    postagem.getUsuario().getId(),
+                    postagem.getId(),
+                    usuario.getNome()
+            );
+        }
     }
 
     public void curtirComentario(Long comentarioId, Long usuarioId) {
@@ -37,5 +48,13 @@ public class CurtidaService {
         Comentario comentario = comentarioRepository.findById(comentarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Comentário não encontrado."));
         curtidaComentarioRepository.save(new CurtidaComentario(usuario, comentario));
+
+        if (!comentario.getUsuario().getId().equals(usuario.getId())) {
+            notificacaoService.notificarCurtidaComentario(
+                    comentario.getUsuario().getId(),
+                    comentario.getId(),
+                    usuario.getNome()
+            );
+        }
     }
 }
