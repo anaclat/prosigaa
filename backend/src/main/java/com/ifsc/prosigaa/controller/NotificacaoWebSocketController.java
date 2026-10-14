@@ -31,7 +31,7 @@ public class NotificacaoWebSocketController {
         notificacao.put("timestamp", LocalDateTime.now().toString());
 
         if (userId != null) {
-            messagingTemplate.convertAndSendToUser(userId.toString(), "/queue/notifications", notificacao);
+            messagingTemplate.convertAndSend("/topic/usuarios/" + userId + "/notifications", notificacao);
         } else {
             messagingTemplate.convertAndSend("/topic/notifications", notificacao);
         }

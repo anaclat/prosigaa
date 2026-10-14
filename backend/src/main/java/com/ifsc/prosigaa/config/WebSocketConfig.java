@@ -35,17 +35,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 "/queue"
         );
 
-        /*
-         * Prefixo utilizado para mensagens destinadas
-         * a um usuário específico.
-         *
-         * Cliente:
-         * /user/queue/notifications
-         *
-         * Servidor:
-         * convertAndSendToUser(...)
-         */
-        registry.setUserDestinationPrefix("/user");
     }
 
     /**

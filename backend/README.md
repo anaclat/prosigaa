@@ -95,4 +95,4 @@ O login atual é uma autenticação demonstrativa, não um mecanismo de seguran�
 
 ## Documentação da iteração
 
-Ver [`docs/`](docs/): casos de uso, especificação REST, arquitetura, modelo relacional/ER, testes e declaração de uso de IA.
+Ver [`docs/`](docs/): casos de uso, especificação REST, arquitetura, modelo relacional/ER, testes, [notificações WebSocket](docs/WEBSOCKET_NOTIFICACOES.md) e declaração de uso de IA.

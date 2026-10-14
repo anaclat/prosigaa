@@ -8,9 +8,10 @@
 </head>
 <body>
     <h2>Teste de WebSocket ProSIGAA</h2>
-    <p>ID do usuário (como se fosse você):
-        <input type="number" id="userId" value="1" />
+    <p>ID do usuário que receberá as notificações:
+        <input type="number" id="userId" min="1" value="1" />
     </p>
+    <p>Use o ID do autor da postagem e mantenha esta página conectada antes de curtir pelo Postman.</p>
     <button onclick="conectar()">1. Conectar como este usuário</button>
     <button onclick="enviarTeste()">2. Enviar teste para este usuário</button>
     <div id="status" style="margin-top: 10px; color: blue;">Aguardando conexão...</div>
@@ -42,9 +43,9 @@
                 onConnect: () => {
                     document.getElementById('status').innerText = 'Conectado como usuário ' + userId + '. Aguardando notificações...';
 
-                    client.subscribe('/user/' + userId + '/queue/notifications', (mensagem) => {
+                    client.subscribe('/topic/usuarios/' + userId + '/notifications', (mensagem) => {
                         const payload = JSON.parse(mensagem.body);
-                        adicionarMensagem('Notificação privada recebida: ' + payload.mensagem);
+                        adicionarMensagem('Notificação recebida: ' + payload.mensagem);
                     });
                 },
                 onStompError: (frame) => {

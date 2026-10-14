@@ -19,9 +19,8 @@ public class NotificacaoService {
             return;
         }
 
-        messagingTemplate.convertAndSendToUser(
-                usuarioId.toString(),
-                "/queue/notifications",
+        messagingTemplate.convertAndSend(
+                "/topic/usuarios/" + usuarioId + "/notifications",
                 notification
         );
     }

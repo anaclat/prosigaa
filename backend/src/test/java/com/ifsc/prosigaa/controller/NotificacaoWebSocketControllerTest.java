@@ -38,4 +38,19 @@ class NotificacaoWebSocketControllerTest {
 
         verify(messagingTemplate).convertAndSend(eq("/topic/notifications"), org.mockito.ArgumentMatchers.<Object>any());
     }
+
+    @Test
+    void deveEnviarNotificacaoDeTesteParaCanalDoUsuarioInformado() throws Exception {
+        mockMvc.perform(post("/api/test/notify")
+                        .param("userId", "10")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"mensagem\":\"Teste para o usuário\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("enviado"));
+
+        verify(messagingTemplate).convertAndSend(
+                eq("/topic/usuarios/10/notifications"),
+                org.mockito.ArgumentMatchers.<Object>any()
+        );
+    }
 }
