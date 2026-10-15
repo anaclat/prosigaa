@@ -34,7 +34,7 @@ export interface ForumPost {
   author: string
   time: string
   categoryLabel: string
-  commentsCount: number
+  likesCount: number
   comments: Comment[]
   phase: string
   phaseId?: number

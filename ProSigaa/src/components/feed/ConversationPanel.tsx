@@ -90,7 +90,9 @@ export function ConversationPanel({ post, onClose, onSubmitComment }: Conversati
                 <div className="comment-thread-body">
                   <div className="comment-thread-header">
                     <strong>{comment.author}</strong>
-                    {comment.isProfessor && <span className="badge-verified">Professor</span>}
+                    {comment.isProfessor && (
+                      <span className="badge-verified">Garantido pelo Professor</span>
+                    )}
                   </div>
                   <p>{comment.message}</p>
                   <div className="comment-thread-footer">

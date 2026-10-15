@@ -30,7 +30,7 @@ export function CommentsPage() {
             <div className="question-meta">
               <span>{post.author}</span>
               <span>•</span>
-              <span>{post.commentsCount} curtidas</span>
+              <span>{post.likesCount} curtidas</span>
             </div>
           </div>
 
@@ -41,7 +41,9 @@ export function CommentsPage() {
                 <div className="comment-thread-body">
                   <div className="comment-thread-header">
                     <strong>{comment.author}</strong>
-                    {comment.isProfessor && <span className="badge-verified">Professor</span>}
+                    {comment.isProfessor && (
+                      <span className="badge-verified">Garantido pelo Professor</span>
+                    )}
                   </div>
                   <p>{comment.message}</p>
                 </div>

@@ -19,7 +19,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
       minute: '2-digit',
     }),
     categoryLabel: `${post.materia?.nome || 'Matéria'} · ${category === 'DUVIDA' ? 'Dúvida' : 'Material'}`,
-    commentsCount: Number(post.curtidas ?? post.comentarios?.length ?? 0),
+    likesCount: Number(post.curtidas ?? 0),
     comments: (post.comentarios || []).map((comment) => ({
       id: String(comment.id),
       author: comment.usuario?.nome || 'Usuário',

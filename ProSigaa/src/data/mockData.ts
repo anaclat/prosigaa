@@ -9,7 +9,7 @@ export const forumPosts: ForumPost[] = [
     description: 'Como identificar qual estrutura de dados faz mais sentido em cada exercício?',
     author: 'Pergunta de João P.',
     time: 'há 2h',
-    commentsCount: 3,
+    likesCount: 18,
     phase: '01',
     subject: 'Algoritmos',
     comments: [
@@ -42,7 +42,7 @@ export const forumPosts: ForumPost[] = [
     description: 'Estou revisando para a prova e travei no método de fatoração. Alguém consegue explicar com exemplo?',
     author: 'Pergunta de Luiza M.',
     time: 'há 1h',
-    commentsCount: 2,
+    likesCount: 9,
     phase: '01',
     subject: 'Cálculo I',
     comments: [
@@ -69,7 +69,7 @@ export const forumPosts: ForumPost[] = [
     description: 'Se as forças têm a mesma intensidade e sentidos opostos, por que elas não se anulam?',
     author: 'Pergunta de Rafael T.',
     time: 'há 2h',
-    commentsCount: 2,
+    likesCount: 12,
     phase: '01',
     subject: 'Física I',
     comments: [
@@ -96,7 +96,7 @@ export const forumPosts: ForumPost[] = [
     description: 'Um mapa rápido para revisar listas, filas, pilhas e árvores antes da próxima aula.',
     author: 'João P.',
     time: 'há 3h',
-    commentsCount: 2,
+    likesCount: 7,
     phase: '01',
     subject: 'Algoritmos',
     comments: [

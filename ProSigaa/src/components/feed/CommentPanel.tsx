@@ -17,7 +17,7 @@ export function CommentPanel({ post }: CommentPanelProps) {
           <div key={comment.id} className={`comment-item ${comment.isProfessor ? 'is-professor' : ''}`}>
             <div className="comment-author-row">
               <strong>{comment.author}</strong>
-              {comment.isProfessor && <span className="professor-tag">Autoridade</span>}
+              {comment.isProfessor && <span className="professor-tag">Garantido pelo Professor</span>}
             </div>
             <p>{comment.message}</p>
           </div>

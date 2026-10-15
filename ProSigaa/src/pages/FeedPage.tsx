@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ConversationPanel } from '../components/feed/ConversationPanel'
 import { FiltersSidebar } from '../components/feed/FiltersSidebar'
 import { NewPostForm } from '../components/feed/NewPostForm'
 import { QuestionCard } from '../components/feed/QuestionCard'
@@ -15,7 +14,6 @@ export function FeedPage() {
   const [selectedPhaseId, setSelectedPhaseId] = useState<number | null>(null)
   const [selectedMateriaId, setSelectedMateriaId] = useState<number | null>(null)
   const [filterType, setFilterType] = useState<'ALL' | 'DUVIDA' | 'MATERIAL_ESTUDO'>('ALL')
-  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null)
   const [isCreatingPost, setIsCreatingPost] = useState(false)
 
   useEffect(() => {
@@ -42,19 +40,15 @@ export function FeedPage() {
   }) => {
     const created = await createPost(payload)
     setPosts((current) => [created, ...current])
-    setSelectedPost(created)
   }
 
-  const handleCommentSubmit = async (content: string) => {
-    if (!selectedPost) return
-
-    const updatedPost = await createComment(selectedPost.id, {
+  const handleCommentSubmit = async (postId: string, content: string) => {
+    const updatedPost = await createComment(postId, {
       conteudo: content,
       usuarioId: 2,
     })
 
     setPosts((current) => current.map((post) => (post.id === updatedPost.id ? updatedPost : post)))
-    setSelectedPost(updatedPost)
   }
 
   useEffect(() => {
@@ -132,8 +126,7 @@ export function FeedPage() {
                 <QuestionCard
                   key={post.id}
                   post={post}
-                  isActive={selectedPost?.id === post.id}
-                  onOpenConversation={(nextPost) => setSelectedPost(nextPost)}
+                  onSubmitComment={handleCommentSubmit}
                 />
               ))
             )}
@@ -155,20 +148,14 @@ export function FeedPage() {
             ))}
           </div>
 
-          {selectedPost ? (
-            <ConversationPanel post={selectedPost} onClose={() => setSelectedPost(null)} onSubmitComment={handleCommentSubmit} />
-          ) : (
-            <>
-              <div className="insight-card">
-                <h3>Nesta semana</h3>
-                <p>Todas as dúvidas do semestre, centralizadas por disciplina.</p>
-              </div>
-              <div className="insight-card">
-                <h3>A melhor resposta ganha</h3>
-                <p>Respostas validadas por professores recebem destaque visual.</p>
-              </div>
-            </>
-          )}
+          <div className="insight-card">
+            <h3>Nesta semana</h3>
+            <p>Todas as dúvidas do semestre, centralizadas por disciplina.</p>
+          </div>
+          <div className="insight-card">
+            <h3>A melhor resposta ganha</h3>
+            <p>Respostas validadas por professores recebem destaque visual.</p>
+          </div>
           <div className="insight-card compact">
             <h3>Conexões rápidas</h3>
             <div className="quick-links">

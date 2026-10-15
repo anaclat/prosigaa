@@ -16,6 +16,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.body.dataset.theme = theme
+    document.documentElement.classList.toggle('dark', theme === 'dark')
     window.localStorage.setItem('prosigaa-theme', theme)
   }, [theme])
 

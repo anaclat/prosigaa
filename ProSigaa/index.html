@@ -1,12 +1,646 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ServiceHub</title>
+    <meta name="theme-color" content="#f8fafc" />
+    <title>ProSigaa — Comunidade acadêmica IFSC</title>
+    <script>
+      (() => {
+        const savedTheme = localStorage.getItem('prosigaa-theme')
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              canvas: { light: '#F8FAFC', dark: '#121824' },
+              panel: { light: '#FFFFFF', dark: '#1E2638' },
+              inset: { light: '#F1F5F9', dark: '#2A354D' },
+              line: { light: '#E2E8F0', dark: '#374360' },
+              ink: { light: '#0F172A', dark: '#F0F4F8' },
+              muted: { light: '#64748B', dark: '#94A3B8' },
+              action: { light: '#2563EB', dark: '#60A5FA' },
+              success: { light: '#10B981', dark: '#34D399' },
+            },
+          },
+        },
+      }
+    </script>
+    <style type="text/tailwindcss">
+      @layer base {
+        body {
+          @apply bg-canvas-light text-ink-light antialiased transition-colors dark:bg-canvas-dark dark:text-ink-dark;
+        }
+        button, input, select, textarea {
+          @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-light dark:focus-visible:ring-action-dark;
+        }
+      }
+      @layer components {
+        .field {
+          @apply w-full rounded-xl border border-line-light bg-inset-light px-4 py-3 text-ink-light placeholder:text-muted-light dark:border-line-dark dark:bg-inset-dark dark:text-ink-dark dark:placeholder:text-muted-dark;
+        }
+        .primary-button {
+          @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-action-light px-5 py-2.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60 dark:bg-action-dark dark:text-slate-950 dark:hover:bg-blue-300;
+        }
+        .secondary-button {
+          @apply inline-flex min-h-10 items-center justify-center rounded-xl border border-line-light bg-panel-light px-4 py-2 font-semibold text-ink-light transition hover:bg-inset-light dark:border-line-dark dark:bg-panel-dark dark:text-ink-dark dark:hover:bg-inset-dark;
+        }
+        .surface-card {
+          @apply rounded-2xl border border-line-light bg-panel-light shadow-sm dark:border-line-dark dark:bg-panel-dark;
+        }
+      }
+    </style>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="min-h-screen">
+    <header class="fixed top-0 z-50 w-full border-b border-line-light bg-white/95 shadow-sm backdrop-blur dark:border-line-dark dark:bg-[#121824]/95">
+      <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <a href="#" class="inline-flex items-center" aria-label="Página inicial">
+          <img src="LOGO_ProSIGAA.png" alt="Logo" class="h-10 w-auto" />
+        </a>
+        <div class="flex items-center gap-2">
+          <span id="header-user" class="hidden max-w-36 truncate text-sm text-muted-light dark:text-muted-dark sm:block"></span>
+          <button id="theme-toggle" class="secondary-button !min-h-10 !w-10 !rounded-full !p-0" type="button" aria-label="Ativar tema escuro" title="Alternar tema">
+            <svg id="theme-icon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+          </button>
+          <button id="logout-button" class="hidden rounded-lg px-3 py-2 text-sm font-semibold text-muted-light hover:bg-inset-light dark:text-muted-dark dark:hover:bg-inset-dark" type="button">
+            Sair
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto min-h-screen max-w-6xl px-4 pb-12 pt-24 sm:px-6">
+      <section id="auth-section" class="mx-auto grid min-h-[calc(100vh-7rem)] max-w-5xl items-center gap-8 lg:grid-cols-2">
+        <div class="hidden rounded-3xl border border-line-light bg-inset-light p-10 dark:border-line-dark dark:bg-panel-dark lg:block">
+          <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold tracking-wider text-action-light dark:bg-blue-950 dark:text-action-dark">COMUNIDADE IFSC</span>
+          <h1 class="mt-6 text-4xl font-bold tracking-tight text-ink-light dark:text-ink-dark">Aprenda junto.<br />Encontre sempre.</h1>
+          <p class="mt-4 max-w-md leading-7 text-muted-light dark:text-muted-dark">Um espaço colaborativo para compartilhar dúvidas e materiais por fase e matéria.</p>
+          <div class="mt-10 flex h-36 items-center justify-center rounded-2xl border border-dashed border-line-light text-action-light dark:border-line-dark dark:text-action-dark" aria-hidden="true">
+            <svg class="h-16 w-16" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="2" />
+              <path d="M21 34h22M32 21v22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <circle cx="32" cy="32" r="5" fill="currentColor" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="surface-card mx-auto w-full max-w-md p-6 sm:p-8">
+          <div class="mb-6">
+            <p class="text-xs font-bold tracking-[0.16em] text-action-light dark:text-action-dark">ACESSO AO PROSIGAA</p>
+            <h2 id="auth-title" class="mt-2 text-2xl font-bold tracking-tight">Entre na sua conta</h2>
+            <p class="mt-2 text-sm leading-6 text-muted-light dark:text-muted-dark">Use seu e-mail institucional do IFSC para continuar.</p>
+          </div>
+
+          <div class="mb-6 grid grid-cols-2 rounded-xl bg-inset-light p-1 dark:bg-inset-dark" role="tablist" aria-label="Acesso">
+            <button id="login-tab" class="rounded-lg bg-panel-light px-3 py-2 text-sm font-semibold text-action-light shadow-sm dark:bg-panel-dark dark:text-action-dark" type="button" role="tab" aria-selected="true">Entrar</button>
+            <button id="register-tab" class="rounded-lg px-3 py-2 text-sm font-semibold text-muted-light dark:text-muted-dark" type="button" role="tab" aria-selected="false">Criar conta</button>
+          </div>
+
+          <form id="auth-form" class="space-y-4">
+            <label id="name-field" class="hidden space-y-2">
+              <span class="text-sm font-semibold">Nome completo</span>
+              <input id="auth-name" class="field" type="text" autocomplete="name" placeholder="Seu nome" />
+            </label>
+            <label class="block space-y-2">
+              <span class="text-sm font-semibold">E-mail institucional</span>
+              <input id="auth-email" class="field" type="email" autocomplete="email" placeholder="nome@ifsc.edu.br" required />
+              <span class="block text-xs text-muted-light dark:text-muted-dark">Dica: utilize seu endereço @ifsc.edu.br</span>
+            </label>
+            <label class="block space-y-2">
+              <span class="text-sm font-semibold">Senha</span>
+              <input id="auth-password" class="field" type="password" autocomplete="current-password" placeholder="Sua senha" required />
+            </label>
+            <button id="auth-submit" class="primary-button w-full" type="submit">Entrar</button>
+            <p id="auth-error" class="hidden text-sm text-red-600 dark:text-red-400" role="alert"></p>
+          </form>
+          <p class="mt-5 text-center text-xs text-muted-light dark:text-muted-dark">Plataforma acadêmica gratuita para estudantes do IFSC.</p>
+        </div>
+      </section>
+
+      <section id="app-section" class="hidden">
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-bold tracking-[0.16em] text-action-light dark:text-action-dark">FÓRUM ACADÊMICO</p>
+            <h1 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Feed da comunidade</h1>
+            <p class="mt-2 text-muted-light dark:text-muted-dark">Dúvidas e materiais organizados para você.</p>
+          </div>
+          <button id="new-post-button" class="primary-button w-full sm:w-auto" type="button">
+            <svg class="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg>
+            Nova publicação
+          </button>
+        </div>
+
+        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div>
+            <div id="feed-status" class="mb-4 hidden rounded-xl border border-line-light bg-panel-light px-4 py-3 text-sm text-muted-light dark:border-line-dark dark:bg-panel-dark dark:text-muted-dark" role="status"></div>
+            <div id="post-list" class="space-y-4" aria-live="polite"></div>
+          </div>
+          <aside class="surface-card hidden p-5 lg:block">
+            <h2 class="font-bold">Seu espaço de estudo</h2>
+            <p class="mt-2 text-sm leading-6 text-muted-light dark:text-muted-dark">Consulte publicações, encontre respostas e contribua com a comunidade acadêmica.</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div id="post-modal" class="fixed inset-0 z-[60] hidden items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm" role="presentation">
+      <section class="surface-card my-auto w-full max-w-xl p-6 shadow-2xl sm:p-8" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold tracking-[0.14em] text-action-light dark:text-action-dark">COMPARTILHE COM A TURMA</p>
+            <h2 id="modal-title" class="mt-2 text-2xl font-bold">Nova publicação</h2>
+          </div>
+          <button id="close-modal" class="secondary-button !min-h-9 !w-9 !rounded-full !p-0 text-xl" type="button" aria-label="Fechar">×</button>
+        </div>
+        <form id="post-form" class="space-y-4">
+          <label class="block space-y-2">
+            <span class="text-sm font-semibold">Título</span>
+            <input id="post-title" class="field" type="text" placeholder="Ex.: Dúvida sobre programação" required />
+          </label>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block space-y-2">
+              <span class="text-sm font-semibold">Tipo</span>
+              <select id="post-type" class="field">
+                <option value="DUVIDA">Dúvida</option>
+                <option value="MATERIAL_ESTUDO">Material de estudo</option>
+              </select>
+            </label>
+            <label class="block space-y-2">
+              <span class="text-sm font-semibold">Fase</span>
+              <select id="post-phase" class="field" required></select>
+            </label>
+          </div>
+          <label class="block space-y-2">
+            <span class="text-sm font-semibold">Matéria</span>
+            <select id="post-subject" class="field" required></select>
+          </label>
+          <label class="block space-y-2">
+            <span class="text-sm font-semibold">Descrição</span>
+            <textarea id="post-content" class="field min-h-32 resize-y" rows="5" placeholder="Descreva sua dúvida ou compartilhe um material." required></textarea>
+          </label>
+          <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-line-light bg-inset-light p-3 dark:border-line-dark dark:bg-inset-dark">
+            <input id="post-anonymous" class="mt-1 h-4 w-4 accent-action-light dark:accent-action-dark" type="checkbox" />
+            <span>
+              <span class="block text-sm font-semibold">Postar como anônimo</span>
+              <span class="mt-1 block text-xs text-muted-light dark:text-muted-dark">A API atual não persiste essa opção.</span>
+            </span>
+          </label>
+          <p id="post-error" class="hidden text-sm text-red-600 dark:text-red-400" role="alert"></p>
+          <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+            <button id="cancel-post" class="secondary-button" type="button">Cancelar</button>
+            <button id="publish-button" class="primary-button" type="submit">Publicar</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      (() => {
+        const API_BASE = 'http://localhost:8080'
+        const USER_ID_KEY = 'usuarioId'
+        const USER_NAME_KEY = 'usuarioNome'
+        const state = {
+          authMode: 'login',
+          userId: localStorage.getItem(USER_ID_KEY),
+          phases: [],
+        }
+
+        const elements = {
+          authSection: document.getElementById('auth-section'),
+          appSection: document.getElementById('app-section'),
+          authTitle: document.getElementById('auth-title'),
+          authForm: document.getElementById('auth-form'),
+          authName: document.getElementById('auth-name'),
+          nameField: document.getElementById('name-field'),
+          authEmail: document.getElementById('auth-email'),
+          authPassword: document.getElementById('auth-password'),
+          authSubmit: document.getElementById('auth-submit'),
+          authError: document.getElementById('auth-error'),
+          loginTab: document.getElementById('login-tab'),
+          registerTab: document.getElementById('register-tab'),
+          headerUser: document.getElementById('header-user'),
+          logoutButton: document.getElementById('logout-button'),
+          themeToggle: document.getElementById('theme-toggle'),
+          themeIcon: document.getElementById('theme-icon'),
+          feedStatus: document.getElementById('feed-status'),
+          postList: document.getElementById('post-list'),
+          newPostButton: document.getElementById('new-post-button'),
+          modal: document.getElementById('post-modal'),
+          closeModal: document.getElementById('close-modal'),
+          cancelPost: document.getElementById('cancel-post'),
+          postForm: document.getElementById('post-form'),
+          postTitle: document.getElementById('post-title'),
+          postType: document.getElementById('post-type'),
+          postPhase: document.getElementById('post-phase'),
+          postSubject: document.getElementById('post-subject'),
+          postContent: document.getElementById('post-content'),
+          postAnonymous: document.getElementById('post-anonymous'),
+          postError: document.getElementById('post-error'),
+          publishButton: document.getElementById('publish-button'),
+        }
+
+        function setTheme(dark) {
+          document.documentElement.classList.toggle('dark', dark)
+          localStorage.setItem('prosigaa-theme', dark ? 'dark' : 'light')
+          elements.themeToggle.setAttribute('aria-label', dark ? 'Ativar tema claro' : 'Ativar tema escuro')
+          elements.themeIcon.innerHTML = dark
+            ? '<path d="M12 3v2m0 14v2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42M3 12h2m14 0h2M5.64 18.36l1.42-1.42m9.88-9.88 1.42-1.42"/><circle cx="12" cy="12" r="4"/>'
+            : '<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/>'
+        }
+
+        function showAuthError(message) {
+          elements.authError.textContent = message
+          elements.authError.classList.remove('hidden')
+          window.alert(message)
+        }
+
+        function setFormError(element, message) {
+          element.textContent = message
+          element.classList.toggle('hidden', !message)
+        }
+
+        async function request(path, options = {}) {
+          let response
+          try {
+            response = await fetch(`${API_BASE}${path}`, {
+              ...options,
+              headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {}),
+              },
+            })
+          } catch {
+            throw new Error('Não foi possível conectar ao backend. Verifique se ele está rodando em http://localhost:8080.')
+          }
+
+          const responseText = await response.text()
+          let data = null
+          if (responseText) {
+            try {
+              data = JSON.parse(responseText)
+            } catch {
+              data = { mensagem: responseText }
+            }
+          }
+          if (!response.ok) {
+            throw new Error(data?.mensagem || data?.message || data?.erro || `Falha na requisição (${response.status}).`)
+          }
+          return data
+        }
+
+        function setAuthMode(mode) {
+          state.authMode = mode
+          const registering = mode === 'register'
+          elements.nameField.classList.toggle('hidden', !registering)
+          elements.authName.required = registering
+          elements.authPassword.autocomplete = registering ? 'new-password' : 'current-password'
+          elements.authTitle.textContent = registering ? 'Crie sua conta' : 'Entre na sua conta'
+          elements.authSubmit.textContent = registering ? 'Criar conta' : 'Entrar'
+          elements.loginTab.className = registering
+            ? 'rounded-lg px-3 py-2 text-sm font-semibold text-muted-light dark:text-muted-dark'
+            : 'rounded-lg bg-panel-light px-3 py-2 text-sm font-semibold text-action-light shadow-sm dark:bg-panel-dark dark:text-action-dark'
+          elements.registerTab.className = registering
+            ? 'rounded-lg bg-panel-light px-3 py-2 text-sm font-semibold text-action-light shadow-sm dark:bg-panel-dark dark:text-action-dark'
+            : 'rounded-lg px-3 py-2 text-sm font-semibold text-muted-light dark:text-muted-dark'
+          elements.loginTab.setAttribute('aria-selected', String(!registering))
+          elements.registerTab.setAttribute('aria-selected', String(registering))
+          elements.authError.classList.add('hidden')
+        }
+
+        function showApp(user) {
+          state.userId = String(user.id)
+          localStorage.setItem(USER_ID_KEY, state.userId)
+          if (user.nome) localStorage.setItem(USER_NAME_KEY, user.nome)
+          elements.headerUser.textContent = user.nome || localStorage.getItem(USER_NAME_KEY) || ''
+          elements.authSection.classList.add('hidden')
+          elements.appSection.classList.remove('hidden')
+          elements.logoutButton.classList.remove('hidden')
+          void loadPhases().then(loadPosts).catch(handleFeedError)
+        }
+
+        function showLogin() {
+          state.userId = null
+          localStorage.removeItem(USER_ID_KEY)
+          localStorage.removeItem(USER_NAME_KEY)
+          elements.headerUser.textContent = ''
+          elements.authSection.classList.remove('hidden')
+          elements.appSection.classList.add('hidden')
+          elements.logoutButton.classList.add('hidden')
+          elements.postList.replaceChildren()
+        }
+
+        function getErrorMessage(error) {
+          return error instanceof Error ? error.message : 'Ocorreu um erro inesperado.'
+        }
+
+        function handleFeedError(error) {
+          const message = getErrorMessage(error)
+          elements.feedStatus.textContent = message
+          elements.feedStatus.classList.remove('hidden')
+          window.alert(message)
+        }
+
+        function formatDate(dateValue) {
+          if (!dateValue) return ''
+          const date = new Date(dateValue)
+          if (Number.isNaN(date.getTime())) return ''
+          return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(date)
+        }
+
+        function createProfessorBadge() {
+          const badge = document.createElement('span')
+          badge.className = 'rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-success-dark'
+          badge.textContent = 'Garantido pelo Professor'
+          return badge
+        }
+
+        function renderComment(comment) {
+          const article = document.createElement('article')
+          article.className = 'rounded-xl border border-line-light bg-inset-light p-3 dark:border-line-dark dark:bg-inset-dark'
+
+          const heading = document.createElement('div')
+          heading.className = 'mb-2 flex flex-wrap items-center gap-2'
+          const author = document.createElement('strong')
+          author.className = 'text-sm'
+          author.textContent = comment.usuario?.nome || 'Estudante'
+          heading.append(author)
+          if (comment.usuario?.tipo === 'PROFESSOR') heading.append(createProfessorBadge())
+
+          const time = document.createElement('time')
+          time.className = 'ml-auto text-xs text-muted-light dark:text-muted-dark'
+          time.textContent = formatDate(comment.criadoEm)
+          heading.append(time)
+
+          const message = document.createElement('p')
+          message.className = 'whitespace-pre-wrap text-sm leading-6 text-muted-light dark:text-muted-dark'
+          message.textContent = comment.conteudo || ''
+          article.append(heading, message)
+          return article
+        }
+
+        function renderPost(post) {
+          const card = document.createElement('article')
+          card.className = 'surface-card p-5 sm:p-6'
+
+          const category = document.createElement('p')
+          category.className = 'mb-3 text-xs font-bold uppercase tracking-wider text-action-light dark:text-action-dark'
+          category.textContent = `${post.materia?.nome || 'Matéria'} · ${post.tipo === 'DUVIDA' ? 'Dúvida' : 'Material'}`
+
+          const title = document.createElement('h2')
+          title.className = 'text-xl font-bold tracking-tight sm:text-2xl'
+          title.textContent = post.titulo || 'Publicação'
+
+          const content = document.createElement('p')
+          content.className = 'mt-3 whitespace-pre-wrap leading-7 text-muted-light dark:text-muted-dark'
+          content.textContent = post.conteudo || ''
+
+          const metadata = document.createElement('p')
+          metadata.className = 'mt-4 flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-light dark:text-muted-dark'
+          const author = document.createElement('span')
+          author.textContent = post.usuario?.nome || 'Estudante'
+          const divider = document.createElement('span')
+          divider.textContent = '·'
+          const date = document.createElement('time')
+          date.textContent = formatDate(post.criadoEm)
+          const phase = document.createElement('span')
+          phase.textContent = `· ${post.fase?.nome || 'Fase'}`
+          metadata.append(author, divider, date, phase)
+
+          const commentSection = document.createElement('section')
+          commentSection.className = 'mt-5 border-t border-line-light pt-4 dark:border-line-dark'
+          const commentHeader = document.createElement('h3')
+          commentHeader.className = 'mb-3 text-sm font-bold'
+          commentHeader.textContent = `Comentários (${Array.isArray(post.comentarios) ? post.comentarios.length : 0})`
+          const comments = document.createElement('div')
+          comments.className = 'space-y-3'
+          ;(post.comentarios || []).forEach((comment) => comments.append(renderComment(comment)))
+          if (!post.comentarios?.length) {
+            const empty = document.createElement('p')
+            empty.className = 'mb-3 text-sm text-muted-light dark:text-muted-dark'
+            empty.textContent = 'Ainda não há comentários. Comece a conversa.'
+            comments.append(empty)
+          }
+
+          const form = document.createElement('form')
+          form.className = 'mt-4 flex flex-col gap-2 sm:flex-row'
+          const input = document.createElement('input')
+          input.className = 'field flex-1'
+          input.type = 'text'
+          input.name = 'comentario'
+          input.maxLength = 1000
+          input.placeholder = 'Escreva um comentário...'
+          input.required = true
+          input.setAttribute('aria-label', `Comentar em ${post.titulo || 'publicação'}`)
+          const submit = document.createElement('button')
+          submit.className = 'primary-button shrink-0'
+          submit.type = 'submit'
+          submit.textContent = 'Enviar'
+          form.append(input, submit)
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault()
+            const conteudo = input.value.trim()
+            if (!conteudo) return
+            submit.disabled = true
+            try {
+              await request(`/postagem/${encodeURIComponent(post.id)}/comentario`, {
+                method: 'POST',
+                body: JSON.stringify({ conteudo, usuarioId: Number(state.userId) }),
+              })
+              await loadPosts()
+            } catch (error) {
+              window.alert(getErrorMessage(error))
+            } finally {
+              submit.disabled = false
+            }
+          })
+
+          commentSection.append(commentHeader, comments, form)
+          card.append(category, title, content, metadata, commentSection)
+          return card
+        }
+
+        async function loadPosts() {
+          elements.feedStatus.classList.add('hidden')
+          elements.postList.replaceChildren()
+          const posts = await request('/postagem')
+          if (!Array.isArray(posts)) throw new Error('O backend retornou uma lista de publicações inválida.')
+          posts.forEach((post) => elements.postList.append(renderPost(post)))
+          if (posts.length === 0) {
+            const empty = document.createElement('div')
+            empty.className = 'surface-card p-8 text-center text-muted-light dark:text-muted-dark'
+            empty.textContent = 'Ainda não há publicações. Que tal iniciar a conversa?'
+            elements.postList.append(empty)
+          }
+        }
+
+        async function loadPhases() {
+          const response = await request('/fase')
+          state.phases = Array.isArray(response?.fases) ? response.fases : []
+          elements.postPhase.replaceChildren()
+          state.phases.forEach((phase) => {
+            const option = document.createElement('option')
+            option.value = phase.id
+            option.textContent = phase.nome
+            elements.postPhase.append(option)
+          })
+          await loadSubjects()
+        }
+
+        async function loadSubjects() {
+          const phaseId = elements.postPhase.value
+          const selectedPhase = state.phases.find((phase) => String(phase.id) === phaseId)
+          let subjects = selectedPhase?.materias || []
+          if (phaseId && subjects.length === 0) {
+            subjects = await request(`/materia?faseId=${encodeURIComponent(phaseId)}`)
+          }
+          elements.postSubject.replaceChildren()
+          subjects.forEach((subject) => {
+            const option = document.createElement('option')
+            option.value = subject.id
+            option.textContent = subject.nome
+            elements.postSubject.append(option)
+          })
+          if (subjects.length === 0) {
+            const option = document.createElement('option')
+            option.value = ''
+            option.textContent = 'Nenhuma matéria disponível'
+            option.disabled = true
+            option.selected = true
+            elements.postSubject.append(option)
+          }
+        }
+
+        function openPostModal() {
+          setFormError(elements.postError, '')
+          elements.postForm.reset()
+          if (state.phases.length > 0) {
+            elements.postPhase.value = String(state.phases[0].id)
+            void loadSubjects().catch((error) => {
+              setFormError(elements.postError, getErrorMessage(error))
+              window.alert(getErrorMessage(error))
+            })
+          }
+          elements.modal.classList.remove('hidden')
+          elements.modal.classList.add('flex')
+          document.body.classList.add('overflow-hidden')
+          elements.postTitle.focus()
+        }
+
+        function closePostModal() {
+          elements.modal.classList.add('hidden')
+          elements.modal.classList.remove('flex')
+          document.body.classList.remove('overflow-hidden')
+        }
+
+        elements.themeToggle.addEventListener('click', () => {
+          setTheme(!document.documentElement.classList.contains('dark'))
+        })
+        elements.loginTab.addEventListener('click', () => setAuthMode('login'))
+        elements.registerTab.addEventListener('click', () => setAuthMode('register'))
+        elements.logoutButton.addEventListener('click', showLogin)
+        elements.postPhase.addEventListener('change', () => {
+          loadSubjects().catch((error) => {
+            setFormError(elements.postError, getErrorMessage(error))
+            window.alert(getErrorMessage(error))
+          })
+        })
+        elements.newPostButton.addEventListener('click', openPostModal)
+        elements.closeModal.addEventListener('click', closePostModal)
+        elements.cancelPost.addEventListener('click', closePostModal)
+        elements.modal.addEventListener('mousedown', (event) => {
+          if (event.target === elements.modal) closePostModal()
+        })
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && !elements.modal.classList.contains('hidden')) closePostModal()
+        })
+
+        elements.authForm.addEventListener('submit', async (event) => {
+          event.preventDefault()
+          elements.authError.classList.add('hidden')
+          elements.authSubmit.disabled = true
+          elements.authSubmit.textContent = state.authMode === 'login' ? 'Entrando...' : 'Criando conta...'
+          try {
+            const isRegistering = state.authMode === 'register'
+            const payload = isRegistering
+              ? {
+                  nome: elements.authName.value.trim(),
+                  email: elements.authEmail.value.trim(),
+                  senha: elements.authPassword.value,
+                  tipo: 'ALUNO',
+                }
+              : {
+                  email: elements.authEmail.value.trim(),
+                  senha: elements.authPassword.value,
+                }
+            const user = await request(isRegistering ? '/usuario/cadastro' : '/usuario/login', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            })
+            if (!user?.id) throw new Error('A resposta do backend não contém o ID do usuário.')
+            showApp(user)
+          } catch (error) {
+            showAuthError(getErrorMessage(error))
+          } finally {
+            elements.authSubmit.disabled = false
+            elements.authSubmit.textContent = state.authMode === 'login' ? 'Entrar' : 'Criar conta'
+          }
+        })
+
+        elements.postForm.addEventListener('submit', async (event) => {
+          event.preventDefault()
+          setFormError(elements.postError, '')
+          const faseId = Number(elements.postPhase.value)
+          const materiaId = Number(elements.postSubject.value)
+          if (!faseId || !materiaId) {
+            setFormError(elements.postError, 'Selecione uma fase e uma matéria válidas.')
+            return
+          }
+          elements.publishButton.disabled = true
+          elements.publishButton.textContent = 'Publicando...'
+          try {
+            await request('/postagem', {
+              method: 'POST',
+              body: JSON.stringify({
+                titulo: elements.postTitle.value.trim(),
+                conteudo: elements.postContent.value.trim(),
+                tipo: elements.postType.value,
+                usuarioId: Number(state.userId),
+                faseId,
+                materiaId,
+              }),
+            })
+            closePostModal()
+            await loadPosts()
+          } catch (error) {
+            const message = getErrorMessage(error)
+            setFormError(elements.postError, message)
+            window.alert(message)
+          } finally {
+            elements.publishButton.disabled = false
+            elements.publishButton.textContent = 'Publicar'
+          }
+        })
+
+        setTheme(document.documentElement.classList.contains('dark'))
+        if (state.userId && Number.isFinite(Number(state.userId))) {
+          showApp({ id: state.userId, nome: localStorage.getItem(USER_NAME_KEY) || '' })
+        } else {
+          showLogin()
+        }
+      })()
+    </script>
   </body>
 </html>
