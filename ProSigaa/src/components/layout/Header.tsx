@@ -45,8 +45,6 @@ export function Header() {
 
       <nav className="main-nav" aria-label="Navegação principal">
         <Link to="/feed">Feed</Link>
-        <Link to="/feed">Dúvidas</Link>
-        <Link to="/feed">Materiais</Link>
       </nav>
 
       <div className="header-actions">
