@@ -3,6 +3,7 @@ import type { ForumMateria, ForumPhase } from '../../interfaces/forum'
 
 interface NewPostFormProps {
   phases: ForumPhase[]
+  userId: number
   onSubmit: (payload: {
     titulo: string
     conteudo: string
@@ -14,9 +15,7 @@ interface NewPostFormProps {
   onCancel: () => void
 }
 
-const DEFAULT_USER_ID = 2
-
-export function NewPostForm({ phases, onSubmit, onCancel }: NewPostFormProps) {
+export function NewPostForm({ phases, userId, onSubmit, onCancel }: NewPostFormProps) {
   const [titulo, setTitulo] = useState('')
   const [conteudo, setConteudo] = useState('')
   const [tipo, setTipo] = useState<'DUVIDA' | 'MATERIAL_ESTUDO'>('DUVIDA')
@@ -84,7 +83,7 @@ export function NewPostForm({ phases, onSubmit, onCancel }: NewPostFormProps) {
         titulo: titulo.trim(),
         conteudo: conteudo.trim(),
         tipo,
-        usuarioId: DEFAULT_USER_ID,
+        usuarioId: userId,
         faseId,
         materiaId,
       })

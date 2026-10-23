@@ -63,27 +63,21 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
 const features: { icon: IconName; title: string; description: string }[] = [
   {
     icon: 'search',
-    title: 'Filtros inteligentes',
+    title: 'Organização por disciplinas',
     description:
-      'Encontre o que precisa por fase e matéria, acompanhando a grade de Análise e Desenvolvimento de Sistemas.',
+      'Encontre dúvidas e conversas organizadas por fase e matéria, sem perder tempo procurando em grupos.',
   },
   {
     icon: 'badge',
-    title: 'Selo garantido pelo professor',
+    title: 'Compartilhamento de materiais',
     description:
-      'Respostas validadas por docentes recebem um destaque especial para você estudar com mais confiança.',
+      'Compartilhe resumos, links e materiais de estudo com quem está aprendendo os mesmos conteúdos.',
   },
   {
     icon: 'eye',
-    title: 'Postagem anônima',
+    title: 'Rede colaborativa',
     description:
-      'Pergunte, aprenda e participe com a opção de publicar suas dúvidas sem se expor.',
-  },
-  {
-    icon: 'tabs',
-    title: 'Navegação por abas',
-    description:
-      'Mantenha o foco no que está estudando com um feed dedicado às disciplinas do seu semestre.',
+      'Faça perguntas, troque experiências e construa um espaço de aprendizagem com a sua turma.',
   },
 ]
 
@@ -121,7 +115,7 @@ export function LandingPage() {
           >
             <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
           </button>
-          <Link to="/feed" className="lp-login-button">Entrar</Link>
+          <Link to="/login" className="lp-login-button">Entrar</Link>
           <button
             className="lp-menu-toggle"
             type="button"
@@ -143,17 +137,17 @@ export function LandingPage() {
               FEITO PARA QUEM ESTUDA NO IFSC
             </span>
             <h1 id="lp-hero-title">
-              Seu repositório acadêmico <span>definitivo.</span>
+              Diga adeus à bagunça dos <span>grupos de estudo.</span>
             </h1>
             <p>
-              Conhecimento bom não devia se perder no meio de tantas mensagens. Encontre e compartilhe
-              dúvidas e materiais em uma plataforma colaborativa, organizada e 100% gratuita.
+              Organize dúvidas, materiais e conversas por disciplina em um só lugar. Estude em comunidade
+              e encontre de novo o que antes se perdia no meio das mensagens.
             </p>
             <div className="lp-hero-actions">
-              <Link to="/feed" className="lp-primary-button">
-                Acessar plataforma <Icon name="arrow" size={18} />
+              <Link to="/cadastro" className="lp-primary-button">
+                Criar conta <Icon name="arrow" size={18} />
               </Link>
-              <a className="lp-text-link" href="#solucao">Conheça o projeto</a>
+              <Link className="lp-text-link lp-secondary-cta" to="/login">Fazer Login</Link>
             </div>
             <div className="lp-trust-note">
               <span className="lp-trust-mark" aria-hidden="true">✓</span>

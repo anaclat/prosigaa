@@ -1,3 +1,5 @@
+import type { ForumPhase } from '../interfaces/forum'
+
 export enum CurriculoPeriodo {
   PRIMEIRO = 'primeiro',
   SEGUNDO = 'segundo',
@@ -73,3 +75,40 @@ export const curriculumPeriods: PeriodoCurricular[] = [
     ],
   },
 ];
+
+export const fallbackForumPhases = curriculumPeriods.map((period, phaseIndex) => ({
+  id: phaseIndex + 1,
+  nome: period.nome,
+  numero: phaseIndex + 1,
+  materias: period.disciplinas.map((nome, materiaIndex) => ({
+    id: (phaseIndex + 1) * 100 + materiaIndex + 1,
+    nome,
+    codigo: '',
+  })),
+}))
+
+function normalizeSubjectName(subjectName: string): string {
+  return subjectName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR')
+    .trim()
+}
+
+export function getCurriculumPhases(apiPhases: ForumPhase[]): ForumPhase[] {
+  return fallbackForumPhases.map((fallbackPhase) => {
+    const apiPhase = apiPhases.find((phase) => phase.numero === fallbackPhase.numero)
+    const materias = fallbackPhase.materias.map((fallbackMateria) => {
+      const apiMateria = apiPhase?.materias.find(
+        (materia) => normalizeSubjectName(materia.nome) === normalizeSubjectName(fallbackMateria.nome),
+      )
+      return apiMateria ?? fallbackMateria
+    })
+
+    return {
+      ...fallbackPhase,
+      id: apiPhase?.id ?? fallbackPhase.id,
+      materias,
+    }
+  })
+}

@@ -1,14 +1,52 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Header } from '../components/layout/Header'
+import { API_URL } from '../services/api'
 
 type AuthMode = 'login' | 'register'
 
-export function AuthPage() {
-  const [mode, setMode] = useState<AuthMode>('login')
+export function AuthPage({ initialMode = 'login' }: { initialMode?: AuthMode }) {
+  const [mode, setMode] = useState<AuthMode>(initialMode)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const navigate = useNavigate()
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const payload = mode === 'login'
+      ? { email: String(form.get('email')), senha: String(form.get('password')) }
+      : {
+          nome: String(form.get('name')),
+          email: String(form.get('email')),
+          senha: String(form.get('password')),
+          tipo: 'ALUNO',
+        }
+
+    setIsSubmitting(true)
+    setErrorMessage('')
+    try {
+      const response = await fetch(`${API_URL}/usuario/${mode === 'login' ? 'login' : 'cadastro'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!response.ok) {
+        const message = await response.text()
+        throw new Error(message || 'Não foi possível autenticar. Verifique seus dados e tente novamente.')
+      }
+
+      const user = await response.json() as { id?: number; nome?: string }
+      if (!user.id) throw new Error('A resposta do servidor não incluiu o identificador do usuário.')
+
+      window.localStorage.setItem('usuarioId', String(user.id))
+      if (user.nome) window.localStorage.setItem('usuarioNome', user.nome)
+      navigate('/feed', { replace: true })
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível conectar ao servidor.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -77,13 +115,13 @@ export function AuthPage() {
                 required
               />
             </label>
-            <button className="auth-submit" type="submit">
-              {mode === 'login' ? 'Entrar' : 'Criar conta'}
+            {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
+            <button className="auth-submit" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Aguarde...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
             </button>
-            <p className="auth-demo-note">Demonstração acadêmica — autenticação não habilitada.</p>
           </form>
 
-          <Link className="auth-back-link" to="/feed">Explorar o feed sem entrar</Link>
+          <Link className="auth-back-link" to="/">Voltar para a página inicial</Link>
         </section>
         <aside className="auth-aside" aria-label="Sobre o ProSigaa">
           <div className="auth-aside-shape auth-aside-shape-one" />

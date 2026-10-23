@@ -93,3 +93,15 @@ Abra o seu navegador e acesse a URL:
 * **Banco de Dados:** H2 Database (Banco em memória para o MVP)
 * **Frontend:** HTML / CSS / Tailwind ou React
 * **Modelagem:** Draw.io
+
+## Frontend React
+
+O frontend React fica em `ProSigaa/`. Para executá-lo localmente:
+
+```bash
+cd ProSigaa
+npm install
+npm run dev
+```
+
+O endereço da API usa `http://localhost:8080` por padrão e pode ser alterado com `VITE_API_URL`. A rota inicial (`/`) apresenta a Landing Page; o feed e as conversas exigem uma sessão iniciada pela API. As notificações usam SockJS/STOMP no endpoint `/ws` e assinam o tópico correspondente ao ID retornado pelo login.

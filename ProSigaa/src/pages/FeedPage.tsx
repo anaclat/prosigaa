@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CommentDrawer } from '../components/feed/CommentDrawer'
 import { FiltersSidebar } from '../components/feed/FiltersSidebar'
 import { NewPostForm } from '../components/feed/NewPostForm'
 import { QuestionCard } from '../components/feed/QuestionCard'
 import { Header } from '../components/layout/Header'
 import { getFases, getForumPosts, createComment, createPost } from '../services/forumService'
 import type { ForumPhase, ForumPost } from '../interfaces/forum'
-import { curriculumPeriods } from '../data/curriculum'
+import { curriculumPeriods, fallbackForumPhases, getCurriculumPhases } from '../data/curriculum'
 
 export function FeedPage() {
   const [posts, setPosts] = useState<ForumPost[]>([])
@@ -15,10 +16,17 @@ export function FeedPage() {
   const [selectedMateriaId, setSelectedMateriaId] = useState<number | null>(null)
   const [filterType, setFilterType] = useState<'ALL' | 'DUVIDA' | 'MATERIAL_ESTUDO'>('ALL')
   const [isCreatingPost, setIsCreatingPost] = useState(false)
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+  const selectedPost = posts.find((post) => post.id === selectedPostId)
+  const curriculumPhases = useMemo(() => getCurriculumPhases(phases), [phases])
+
+  const closeComments = useCallback(() => setSelectedPostId(null), [])
 
   useEffect(() => {
     getForumPosts().then(setPosts)
-    getFases().then(setPhases)
+    getFases().then((loadedPhases) => {
+      setPhases(loadedPhases.length ? loadedPhases : fallbackForumPhases)
+    })
   }, [])
 
   const visiblePosts = useMemo(() => {
@@ -43,30 +51,18 @@ export function FeedPage() {
   }
 
   const handleCommentSubmit = async (postId: string, content: string) => {
+    const usuarioId = Number(window.localStorage.getItem('usuarioId'))
+    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
+      throw new Error('Sua sessão expirou. Entre novamente para comentar.')
+    }
+
     const updatedPost = await createComment(postId, {
       conteudo: content,
-      usuarioId: 2,
+      usuarioId,
     })
 
     setPosts((current) => current.map((post) => (post.id === updatedPost.id ? updatedPost : post)))
   }
-
-  useEffect(() => {
-    if (selectedPhaseId === null) {
-      setSelectedMateriaId(null)
-      return
-    }
-
-    const currentPhase = phases.find((phase) => phase.id === selectedPhaseId)
-    if (!currentPhase || !currentPhase.materias.length) {
-      setSelectedMateriaId(null)
-      return
-    }
-
-    if (selectedMateriaId === null || !currentPhase.materias.some((materia) => materia.id === selectedMateriaId)) {
-      setSelectedMateriaId(currentPhase.materias[0].id)
-    }
-  }, [phases, selectedMateriaId, selectedPhaseId])
 
   return (
     <div className="feed-page-shell">
@@ -75,15 +71,18 @@ export function FeedPage() {
       <main className="feed-layout">
         <div className="feed-left-column">
           <FiltersSidebar
-            phases={phases}
+            phases={curriculumPhases}
             selectedPhaseId={selectedPhaseId}
             selectedMateriaId={selectedMateriaId}
+            filterType={filterType}
             onSelectPhase={(phaseId) => {
               setSelectedPhaseId(phaseId)
+              setSelectedMateriaId(null)
             }}
             onSelectMateria={(materiaId) => {
               setSelectedMateriaId(materiaId)
             }}
+            onFilterTypeChange={setFilterType}
           />
         </div>
 
@@ -93,15 +92,6 @@ export function FeedPage() {
               <h1>Sua turma, suas dúvidas.</h1>
             </div>
             <div className="toolbar-actions">
-              <button type="button" className={`pill ${filterType === 'ALL' ? 'active' : ''}`} onClick={() => setFilterType('ALL')}>
-                Todas
-              </button>
-              <button type="button" className={`pill ${filterType === 'DUVIDA' ? 'active' : ''}`} onClick={() => setFilterType('DUVIDA')}>
-                Dúvidas
-              </button>
-              <button type="button" className={`pill ${filterType === 'MATERIAL_ESTUDO' ? 'active' : ''}`} onClick={() => setFilterType('MATERIAL_ESTUDO')}>
-                Materiais
-              </button>
               <button type="button" className="primary-button small" onClick={() => setIsCreatingPost(true)}>
                 Nova postagem
               </button>
@@ -112,6 +102,7 @@ export function FeedPage() {
             <div className="composer-wrap">
               <NewPostForm
                 phases={phases}
+                userId={Number(window.localStorage.getItem('usuarioId'))}
                 onSubmit={handleNewPost}
                 onCancel={() => setIsCreatingPost(false)}
               />
@@ -126,7 +117,7 @@ export function FeedPage() {
                 <QuestionCard
                   key={post.id}
                   post={post}
-                  onSubmitComment={handleCommentSubmit}
+                  onOpenComments={setSelectedPostId}
                 />
               ))
             )}
@@ -165,6 +156,13 @@ export function FeedPage() {
           </div>
         </aside>
       </main>
+      {selectedPost && (
+        <CommentDrawer
+          post={selectedPost}
+          onClose={closeComments}
+          onSubmitComment={handleCommentSubmit}
+        />
+      )}
     </div>
   )
 }

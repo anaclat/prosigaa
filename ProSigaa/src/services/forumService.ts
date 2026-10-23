@@ -1,7 +1,6 @@
 import { forumPosts } from '../data/mockData'
 import type { BackendPostDTO, ForumMateria, ForumPhase, ForumPost } from '../interfaces/forum'
-
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:8080'
+import { API_URL } from './api'
 
 function normalizePost(post: BackendPostDTO): ForumPost {
   const category = post.tipo === 'DUVIDA' ? 'DUVIDA' : 'MATERIAL_ESTUDO'
