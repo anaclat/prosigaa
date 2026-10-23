@@ -6,5 +6,6 @@ public record ComentarioDTO(
         Long id,
         String conteudo,
         LocalDateTime criadoEm,
-        UsuarioResumoDTO usuario
+        UsuarioResumoDTO usuario,
+        int curtidas
 ) {}

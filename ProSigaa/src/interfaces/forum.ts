@@ -74,6 +74,7 @@ export interface BackendPostDTO {
     id: number
     conteudo: string
     criadoEm: string
+    curtidas?: number
     usuario: {
       id: number
       nome: string

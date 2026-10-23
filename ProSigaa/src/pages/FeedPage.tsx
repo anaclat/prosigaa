@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { CommentDrawer } from '../components/feed/CommentDrawer'
 import { FiltersSidebar } from '../components/feed/FiltersSidebar'
 import { NewPostForm } from '../components/feed/NewPostForm'
 import { QuestionCard } from '../components/feed/QuestionCard'
 import { Header } from '../components/layout/Header'
 import { getFases, getForumPosts, createComment, createPost } from '../services/forumService'
+import { hasLikedContent, likeComment, likePost, rememberLike } from '../services/likeService'
 import type { ForumPhase, ForumPost } from '../interfaces/forum'
-import { curriculumPeriods, fallbackForumPhases, getCurriculumPhases } from '../data/curriculum'
+import { fallbackForumPhases, getCurriculumPhases } from '../data/curriculum'
 
 export function FeedPage() {
   const [posts, setPosts] = useState<ForumPost[]>([])
@@ -19,11 +19,22 @@ export function FeedPage() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
   const selectedPost = posts.find((post) => post.id === selectedPostId)
   const curriculumPhases = useMemo(() => getCurriculumPhases(phases), [phases])
+  const currentUserId = Number(window.localStorage.getItem('usuarioId'))
 
   const closeComments = useCallback(() => setSelectedPostId(null), [])
 
   useEffect(() => {
-    getForumPosts().then(setPosts)
+    getForumPosts().then((loadedPosts) => {
+      const userId = Number(window.localStorage.getItem('usuarioId'))
+      setPosts(loadedPosts.map((post) => ({
+        ...post,
+        liked: hasLikedContent(userId, 'postagem', post.id),
+        comments: post.comments.map((comment) => ({
+          ...comment,
+          liked: hasLikedContent(userId, 'comentario', comment.id),
+        })),
+      })))
+    })
     getFases().then((loadedPhases) => {
       setPhases(loadedPhases.length ? loadedPhases : fallbackForumPhases)
     })
@@ -51,17 +62,82 @@ export function FeedPage() {
   }
 
   const handleCommentSubmit = async (postId: string, content: string) => {
-    const usuarioId = Number(window.localStorage.getItem('usuarioId'))
-    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
+    if (!Number.isSafeInteger(currentUserId) || currentUserId <= 0) {
       throw new Error('Sua sessão expirou. Entre novamente para comentar.')
     }
 
     const updatedPost = await createComment(postId, {
       conteudo: content,
-      usuarioId,
+      usuarioId: currentUserId,
     })
 
-    setPosts((current) => current.map((post) => (post.id === updatedPost.id ? updatedPost : post)))
+    setPosts((current) => current.map((post) => post.id === updatedPost.id
+      ? {
+          ...updatedPost,
+          liked: post.liked,
+          comments: updatedPost.comments.map((comment) => {
+            const previousComment = post.comments.find((item) => item.id === comment.id)
+            return previousComment
+              ? { ...comment, liked: previousComment.liked, likes: Math.max(comment.likes ?? 0, previousComment.likes ?? 0) }
+              : comment
+          }),
+        }
+      : post))
+  }
+
+  const handleLikePost = async (postId: string) => {
+    if (!Number.isSafeInteger(currentUserId) || currentUserId <= 0) {
+      throw new Error('Sua sessão expirou. Entre novamente para curtir.')
+    }
+
+    const post = posts.find((item) => item.id === postId)
+    if (!post || post.liked) return
+
+    setPosts((current) => current.map((item) => item.id === postId
+      ? { ...item, liked: true, likesCount: item.likesCount + 1 }
+      : item))
+    try {
+      await likePost(postId, currentUserId)
+      rememberLike(currentUserId, 'postagem', postId)
+    } catch (error) {
+      setPosts((current) => current.map((item) => item.id === postId
+        ? { ...item, liked: false, likesCount: Math.max(0, item.likesCount - 1) }
+        : item))
+      throw error
+    }
+  }
+
+  const handleLikeComment = async (commentId: string) => {
+    if (!Number.isSafeInteger(currentUserId) || currentUserId <= 0) {
+      throw new Error('Sua sessão expirou. Entre novamente para curtir.')
+    }
+
+    const post = posts.find((item) => item.comments.some((comment) => comment.id === commentId))
+    const comment = post?.comments.find((item) => item.id === commentId)
+    if (!post || !comment || comment.liked) return
+
+    setPosts((current) => current.map((item) => item.id === post.id
+      ? {
+          ...item,
+          comments: item.comments.map((reply) => reply.id === commentId
+            ? { ...reply, liked: true, likes: (reply.likes ?? 0) + 1 }
+            : reply),
+        }
+      : item))
+    try {
+      await likeComment(commentId, currentUserId)
+      rememberLike(currentUserId, 'comentario', commentId)
+    } catch (error) {
+      setPosts((current) => current.map((item) => item.id === post.id
+        ? {
+            ...item,
+            comments: item.comments.map((reply) => reply.id === commentId
+              ? { ...reply, liked: false, likes: Math.max(0, (reply.likes ?? 0) - 1) }
+              : reply),
+          }
+        : item))
+      throw error
+    }
   }
 
   return (
@@ -101,8 +177,8 @@ export function FeedPage() {
           {isCreatingPost && (
             <div className="composer-wrap">
               <NewPostForm
-                phases={phases}
-                userId={Number(window.localStorage.getItem('usuarioId'))}
+                phases={curriculumPhases}
+                userId={currentUserId}
                 onSubmit={handleNewPost}
                 onCancel={() => setIsCreatingPost(false)}
               />
@@ -118,49 +194,20 @@ export function FeedPage() {
                   key={post.id}
                   post={post}
                   onOpenComments={setSelectedPostId}
+                  onLike={handleLikePost}
                 />
               ))
             )}
           </div>
         </div>
 
-        <aside className="feed-right-column">
-          <div className="curriculum-sidebar">
-            <h3>Estrutura curricular</h3>
-            {curriculumPeriods.map((period) => (
-              <div key={period.id} className="curriculum-card sidebar-card">
-                <span>{period.nome}</span>
-                <ul>
-                  {period.disciplinas.map((disciplina) => (
-                    <li key={disciplina}>{disciplina}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="insight-card">
-            <h3>Nesta semana</h3>
-            <p>Todas as dúvidas do semestre, centralizadas por disciplina.</p>
-          </div>
-          <div className="insight-card">
-            <h3>A melhor resposta ganha</h3>
-            <p>Respostas validadas por professores recebem destaque visual.</p>
-          </div>
-          <div className="insight-card compact">
-            <h3>Conexões rápidas</h3>
-            <div className="quick-links">
-              <Link to="/">Voltar para a apresentação</Link>
-              <Link to="/feed">Atualizar feed</Link>
-            </div>
-          </div>
-        </aside>
       </main>
       {selectedPost && (
         <CommentDrawer
           post={selectedPost}
           onClose={closeComments}
           onSubmitComment={handleCommentSubmit}
+          onLikeComment={handleLikeComment}
         />
       )}
     </div>

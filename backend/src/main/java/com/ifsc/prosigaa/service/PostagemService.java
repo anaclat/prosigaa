@@ -71,7 +71,8 @@ public class PostagemService {
         List<ComentarioDTO> comentarios = p.getComentarios().stream()
                 .map(c -> new ComentarioDTO(
                         c.getId(), c.getConteudo(), c.getCriadoEm(),
-                        new UsuarioResumoDTO(c.getUsuario().getId(), c.getUsuario().getNome(), c.getUsuario().getTipo())
+                        new UsuarioResumoDTO(c.getUsuario().getId(), c.getUsuario().getNome(), c.getUsuario().getTipo()),
+                        c.getCurtidas().size()
                 ))
                 .toList();
 

@@ -30,27 +30,11 @@ export function NewPostForm({ phases, userId, onSubmit, onCancel }: NewPostFormP
     onCancelRef.current = onCancel
   }, [onCancel])
 
-  const selectedPhase = useMemo(
-    () => phases.find((phase) => phase.id === faseId) ?? phases[0],
-    [faseId, phases],
-  )
+  const selectedPhase = useMemo(() => phases.find((phase) => phase.id === faseId), [faseId, phases])
 
   useEffect(() => {
-    if (!selectedPhase) {
-      setFaseId(0)
-      setMateriaId(0)
-      return
-    }
-
-    if (!selectedPhase.materias?.length) {
-      setMateriaId(0)
-      return
-    }
-
-    if (!selectedPhase.materias.some((materia) => materia.id === materiaId)) {
-      setMateriaId(selectedPhase.materias[0].id)
-    }
-  }, [materiaId, selectedPhase])
+    setMateriaId(selectedPhase?.materias[0]?.id ?? 0)
+  }, [faseId, selectedPhase])
 
   useEffect(() => {
     if (phases.length > 0 && !faseId) {
@@ -152,7 +136,7 @@ export function NewPostForm({ phases, userId, onSubmit, onCancel }: NewPostFormP
               <select value={faseId} onChange={(event) => setFaseId(Number(event.target.value))}>
                 {phases.map((phase) => (
                   <option key={phase.id} value={phase.id}>
-                    {phase.nome}
+                    {phase.numero}º Período
                   </option>
                 ))}
               </select>

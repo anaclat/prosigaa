@@ -25,6 +25,8 @@ Todos os corpos são JSON salvo indicação em contrário. IDs são numéricos (
 | Curtida | `POST /curtida/postagem/{postagemId}?usuarioId={id}` | IDs | Mensagem de confirmação |
 | Curtida | `POST /curtida/comentario/{comentarioId}?usuarioId={id}` | IDs | Mensagem de confirmação |
 
+As respostas de postagem incluem a contagem `curtidas`; cada item de `comentarios` também inclui `curtidas` para exibir a contagem no feed.
+
 ## Códigos HTTP
 
 - `200 OK`: consulta ou operação concluída.

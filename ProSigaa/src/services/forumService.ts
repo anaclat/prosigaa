@@ -31,7 +31,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
       }),
       isProfessor: comment.usuario?.tipo === 'PROFESSOR',
       liked: false,
-      likes: 0,
+      likes: Number(comment.curtidas ?? 0),
     })),
     phase: post.fase?.nome || 'Fase',
     phaseId: post.fase?.id,
