@@ -105,3 +105,13 @@ npm run dev
 ```
 
 O endereço da API usa `http://localhost:8080` por padrão e pode ser alterado com `VITE_API_URL`. A rota inicial (`/`) apresenta a Landing Page; o feed e as conversas exigem uma sessão iniciada pela API. As notificações usam SockJS/STOMP no endpoint `/ws` e assinam o tópico correspondente ao ID retornado pelo login.
+
+
+## Backend Spring Boot 
+
+O backend Spring Boot fica em `backend/`. Para executá-lo localmente:
+
+```bash
+cd backend
+gradlew.bat bootRun
+```
