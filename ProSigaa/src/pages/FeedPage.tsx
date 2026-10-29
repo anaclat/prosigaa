@@ -7,37 +7,40 @@ import { Header } from '../components/layout/Header'
 import { getFases, getForumPosts, createComment, createPost } from '../services/forumService'
 import { hasLikedContent, likeComment, likePost, rememberLike } from '../services/likeService'
 import type { ForumPhase, ForumPost } from '../interfaces/forum'
-import { fallbackForumPhases, getCurriculumPhases } from '../data/curriculum'
 
 export function FeedPage() {
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [phases, setPhases] = useState<ForumPhase[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [selectedPhaseId, setSelectedPhaseId] = useState<number | null>(null)
   const [selectedMateriaId, setSelectedMateriaId] = useState<number | null>(null)
   const [filterType, setFilterType] = useState<'ALL' | 'DUVIDA' | 'MATERIAL_ESTUDO'>('ALL')
   const [isCreatingPost, setIsCreatingPost] = useState(false)
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
   const selectedPost = posts.find((post) => post.id === selectedPostId)
-  const curriculumPhases = useMemo(() => getCurriculumPhases(phases), [phases])
   const currentUserId = Number(window.localStorage.getItem('usuarioId'))
 
   const closeComments = useCallback(() => setSelectedPostId(null), [])
 
   useEffect(() => {
-    getForumPosts().then((loadedPosts) => {
-      const userId = Number(window.localStorage.getItem('usuarioId'))
-      setPosts(loadedPosts.map((post) => ({
-        ...post,
-        liked: hasLikedContent(userId, 'postagem', post.id),
-        comments: post.comments.map((comment) => ({
-          ...comment,
-          liked: hasLikedContent(userId, 'comentario', comment.id),
-        })),
-      })))
-    })
-    getFases().then((loadedPhases) => {
-      setPhases(loadedPhases.length ? loadedPhases : fallbackForumPhases)
-    })
+    Promise.all([getForumPosts(), getFases()])
+      .then(([loadedPosts, loadedPhases]) => {
+        const userId = Number(window.localStorage.getItem('usuarioId'))
+        setPosts(loadedPosts.map((post) => ({
+          ...post,
+          liked: hasLikedContent(userId, 'postagem', post.id),
+          comments: post.comments.map((comment) => ({
+            ...comment,
+            liked: hasLikedContent(userId, 'comentario', comment.id),
+          })),
+        })))
+        setPhases(loadedPhases)
+      })
+      .catch((error: unknown) => {
+        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar o fórum.')
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const visiblePosts = useMemo(() => {
@@ -147,7 +150,7 @@ export function FeedPage() {
       <main className="feed-layout">
         <div className="feed-left-column">
           <FiltersSidebar
-            phases={curriculumPhases}
+            phases={phases}
             selectedPhaseId={selectedPhaseId}
             selectedMateriaId={selectedMateriaId}
             filterType={filterType}
@@ -177,7 +180,7 @@ export function FeedPage() {
           {isCreatingPost && (
             <div className="composer-wrap">
               <NewPostForm
-                phases={curriculumPhases}
+                phases={phases}
                 userId={currentUserId}
                 onSubmit={handleNewPost}
                 onCancel={() => setIsCreatingPost(false)}
@@ -186,7 +189,13 @@ export function FeedPage() {
           )}
 
           <div className="post-list">
-            {visiblePosts.length === 0 ? (
+            {loadError ? (
+              <div className="empty-state" role="alert">
+                Não foi possível carregar o fórum: {loadError}
+              </div>
+            ) : isLoading ? (
+              <div className="empty-state">Carregando o fórum...</div>
+            ) : visiblePosts.length === 0 ? (
               <div className="empty-state">Nenhuma conversa encontrada para os filtros selecionados.</div>
             ) : (
               visiblePosts.map((post) => (

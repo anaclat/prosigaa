@@ -1,4 +1,3 @@
-import { forumPosts } from '../data/mockData'
 import type { BackendPostDTO, ForumMateria, ForumPhase, ForumPost } from '../interfaces/forum'
 import { API_URL } from './api'
 
@@ -42,42 +41,30 @@ function normalizePost(post: BackendPostDTO): ForumPost {
 }
 
 export async function getForumPosts(): Promise<ForumPost[]> {
-  try {
-    const response = await fetch(`${API_URL}/postagem`)
-    if (!response.ok) {
-      throw new Error('Erro ao buscar posts')
-    }
-    const payload = (await response.json()) as BackendPostDTO[]
-    return payload.map(normalizePost)
-  } catch {
-    return forumPosts
+  const response = await fetch(`${API_URL}/postagem`)
+  if (!response.ok) {
+    throw new Error((await response.text()) || 'Erro ao buscar postagens.')
   }
+  const payload = (await response.json()) as BackendPostDTO[]
+  return payload.map(normalizePost)
 }
 
 export async function getForumPostById(postId: string): Promise<ForumPost | undefined> {
-  try {
-    const response = await fetch(`${API_URL}/postagem/${postId}`)
-    if (!response.ok) {
-      throw new Error('Post não encontrado')
-    }
-    const payload = (await response.json()) as BackendPostDTO
-    return normalizePost(payload)
-  } catch {
-    return forumPosts.find((post) => post.id === postId)
+  const response = await fetch(`${API_URL}/postagem/${postId}`)
+  if (!response.ok) {
+    throw new Error((await response.text()) || 'Postagem não encontrada.')
   }
+  const payload = (await response.json()) as BackendPostDTO
+  return normalizePost(payload)
 }
 
 export async function getFases(): Promise<ForumPhase[]> {
-  try {
-    const response = await fetch(`${API_URL}/fase`)
-    if (!response.ok) {
-      throw new Error('Erro ao buscar fases')
-    }
-    const payload = (await response.json()) as { fases?: ForumPhase[] }
-    return payload.fases ?? []
-  } catch {
-    return []
+  const response = await fetch(`${API_URL}/fase`)
+  if (!response.ok) {
+    throw new Error((await response.text()) || 'Erro ao buscar fases e matérias.')
   }
+  const payload = (await response.json()) as { fases: ForumPhase[] }
+  return payload.fases
 }
 
 export async function getMateriasByFase(faseId?: number): Promise<ForumMateria[]> {

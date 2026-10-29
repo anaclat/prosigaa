@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -21,13 +22,24 @@ class ApiIntegracaoTest {
     void deveConsultarFasesPelaApiComAplicacaoIntegrada() throws Exception {
         mockMvc.perform(get("/fase"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.fases").isArray())
+                .andExpect(jsonPath("$.fases.length()").value(5))
+                .andExpect(jsonPath("$.fases[0].nome").value("1º período"))
+                .andExpect(jsonPath("$.fases[0].materias.length()").value(6))
+                .andExpect(jsonPath("$.fases[4].materias.length()").value(7));
     }
 
     @Test
     void deveRetornarListaDePostagens() throws Exception {
         mockMvc.perform(get("/postagem"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(4));
+
+        mockMvc.perform(get("/postagem/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.comentarios.length()").value(3));
     }
 }

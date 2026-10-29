@@ -37,6 +37,8 @@ A API fica em `http://localhost:8080`. A documentação interativa fica em `http
 
 O banco de desenvolvimento é criado no diretório `data/` e mantém os dados entre reinicializações. O console H2 está disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:./data/prosigaa`, usuário `sa`, senha vazia). Não exponha o console H2 em produção.
 
+Na primeira inicialização, o backend cadastra as cinco fases do currículo, suas matérias, os usuários de demonstração e exemplos de postagens e comentários. Esse conteúdo é persistido no H2; as postagens de exemplo só são inseridas quando ainda não há nenhuma postagem.
+
 ## Testes
 
 ```bash

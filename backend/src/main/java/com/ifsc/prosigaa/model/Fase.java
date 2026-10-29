@@ -36,4 +36,6 @@ public class Fase {
     public String getNome() { return nome; }
     public int getNumero() { return numero; }
     public List<Materia> getMaterias() { return materias; }
+
+    public void renomear(String nome) { this.nome = nome; }
 }

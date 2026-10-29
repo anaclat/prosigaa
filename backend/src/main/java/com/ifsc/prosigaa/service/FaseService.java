@@ -18,7 +18,7 @@ public class FaseService {
     }
 
     public FasesDTO listar() {
-        List<FaseDTO> fases = faseRepository.findAll().stream()
+        List<FaseDTO> fases = faseRepository.findAllByOrderByNumeroAsc().stream()
                 .map(f -> new FaseDTO(
                         f.getId(), f.getNome(), f.getNumero(),
                         f.getMaterias().stream()
