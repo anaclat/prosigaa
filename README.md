@@ -153,6 +153,10 @@ Configuração recomendada no serviço:
 - Porta exposta: `80`
 - Volume persistente: montar em `/app/data` (opcional, para persistir H2)
 
+Variável opcional para restringir CORS (recomendado em produção):
+
+- `APP_CORS_ALLOWED_ORIGIN_PATTERNS=https://seu-dominio.com,https://www.seu-dominio.com`
+
 Depois do deploy, tudo fica no mesmo domínio:
 
 - Frontend: `/`
