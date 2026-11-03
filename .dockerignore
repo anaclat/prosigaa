@@ -1,0 +1,9 @@
+.git
+.gitignore
+.vscode
+.idea
+backend/build
+backend/.gradle
+backend/data
+ProSigaa/node_modules
+ProSigaa/dist

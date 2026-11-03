@@ -33,26 +33,20 @@ No Windows:
 gradlew.bat bootRun
 ```
 
-## Executar com Docker
+## Executar com Docker (container único)
 
-Também é possível executar via Docker Compose na raiz do repositório:
+O deploy recomendado está no `Dockerfile` da raiz do repositório e sobe frontend + backend em um único container, ideal para Coolify.
 
-```bash
-docker compose up --build
-```
-
-Se a porta 8080 já estiver ocupada no host:
+Na raiz do projeto:
 
 ```bash
-BACKEND_PORT=8081 FRONTEND_PORT=3001 VITE_API_URL=http://localhost:8081 docker compose up --build
+docker build -t prosigaa .
+docker run --rm -p 3000:80 -v $(pwd)/backend/data:/app/data prosigaa
 ```
 
-Ou somente o backend:
+No modo container único, a API fica disponível via proxy em `/api`:
 
-```bash
-docker build -t prosigaa-backend .
-docker run --rm -p 8080:8080 -v $(pwd)/data:/app/data prosigaa-backend
-```
+- `http://localhost:3000/api/swagger-ui.html`
 
 A API fica em `http://localhost:8080`. A documentação interativa fica em `http://localhost:8080/swagger-ui.html` e o documento OpenAPI JSON em `http://localhost:8080/v3/api-docs`.
 
@@ -70,7 +64,7 @@ Exemplo:
 APP_CORS_ALLOWED_ORIGIN_PATTERNS="http://localhost:*,https://*.vercel.app,https://meu-frontend.com"
 ```
 
-Valor padrão inclui localhost e domínios `*.vercel.app`.
+Valor padrão inclui localhost e domínios `*.vercel.app`; em produção ajuste para os domínios que você realmente usa.
 
 Na primeira inicialização, o backend cadastra as cinco fases do currículo, suas matérias, os usuários de demonstração e exemplos de postagens e comentários. Esse conteúdo é persistido no H2; as postagens de exemplo só são inseridas quando ainda não há nenhuma postagem.
 

@@ -116,38 +116,45 @@ cd backend
 gradlew.bat bootRun
 ```
 
-## Docker (Frontend + Backend)
+## Docker (um container para tudo)
 
-Na raiz do repositório, execute:
+Para facilitar deploy no Coolify, o projeto possui um único `Dockerfile` na raiz que sobe:
 
-```bash
-docker compose up --build
-```
+- Frontend React (arquivos estáticos no Nginx)
+- Backend Spring Boot (Java)
+- Proxy interno `/api` -> backend
 
-Serviços disponíveis:
-
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8080`
-- Swagger: `http://localhost:8080/swagger-ui.html`
-
-Se alguma porta já estiver em uso, ajuste antes de subir:
+Build da imagem:
 
 ```bash
-BACKEND_PORT=8081 FRONTEND_PORT=3001 VITE_API_URL=http://localhost:8081 docker compose up --build
+docker build -t prosigaa .
 ```
 
-Por padrão, o frontend em Docker usa `VITE_API_URL=http://localhost:8080`.
-Se quiser apontar para outra API, defina a variável antes de subir os containers:
+Execução:
 
 ```bash
-VITE_API_URL=https://sua-api.exemplo.com docker compose up --build
+docker run --rm -p 3000:80 -v $(pwd)/backend/data:/app/data prosigaa
 ```
 
-## Deploy do Frontend na Vercel
+Endpoints:
 
-No projeto da Vercel (pasta `ProSigaa/`), configure a variável de ambiente:
+- Aplicação: `http://localhost:3000`
+- API (via proxy): `http://localhost:3000/api`
+- Swagger (via proxy): `http://localhost:3000/api/swagger-ui.html`
 
-- `VITE_API_URL=https://<URL-DO-SEU-BACKEND>`
+## Deploy no Coolify (simples)
 
-Sem essa variável em produção, o frontend usa `/api` como fallback.
-Se quiser usar esse fallback, você pode configurar rewrites/proxy na plataforma de deploy.
+Use a raiz do repositório como contexto de build.
+
+Configuração recomendada no serviço:
+
+- Build Type: `Dockerfile`
+- Dockerfile: `./Dockerfile`
+- Porta exposta: `80`
+- Volume persistente: montar em `/app/data` (opcional, para persistir H2)
+
+Depois do deploy, tudo fica no mesmo domínio:
+
+- Frontend: `/`
+- API: `/api`
+- Swagger: `/api/swagger-ui.html`
