@@ -33,9 +33,44 @@ No Windows:
 gradlew.bat bootRun
 ```
 
+## Executar com Docker
+
+Também é possível executar via Docker Compose na raiz do repositório:
+
+```bash
+docker compose up --build
+```
+
+Se a porta 8080 já estiver ocupada no host:
+
+```bash
+BACKEND_PORT=8081 FRONTEND_PORT=3001 VITE_API_URL=http://localhost:8081 docker compose up --build
+```
+
+Ou somente o backend:
+
+```bash
+docker build -t prosigaa-backend .
+docker run --rm -p 8080:8080 -v $(pwd)/data:/app/data prosigaa-backend
+```
+
 A API fica em `http://localhost:8080`. A documentação interativa fica em `http://localhost:8080/swagger-ui.html` e o documento OpenAPI JSON em `http://localhost:8080/v3/api-docs`.
 
 O banco de desenvolvimento é criado no diretório `data/` e mantém os dados entre reinicializações. O console H2 está disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:./data/prosigaa`, usuário `sa`, senha vazia). Não exponha o console H2 em produção.
+
+### CORS por ambiente
+
+As origens aceitas por CORS e WebSocket podem ser ajustadas via propriedade:
+
+- `app.cors.allowed-origin-patterns`
+
+Exemplo:
+
+```bash
+APP_CORS_ALLOWED_ORIGIN_PATTERNS="http://localhost:*,https://*.vercel.app,https://meu-frontend.com"
+```
+
+Valor padrão inclui localhost e domínios `*.vercel.app`.
 
 Na primeira inicialização, o backend cadastra as cinco fases do currículo, suas matérias, os usuários de demonstração e exemplos de postagens e comentários. Esse conteúdo é persistido no H2; as postagens de exemplo só são inseridas quando ainda não há nenhuma postagem.
 

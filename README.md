@@ -115,3 +115,39 @@ O backend Spring Boot fica em `backend/`. Para executá-lo localmente:
 cd backend
 gradlew.bat bootRun
 ```
+
+## Docker (Frontend + Backend)
+
+Na raiz do repositório, execute:
+
+```bash
+docker compose up --build
+```
+
+Serviços disponíveis:
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080`
+- Swagger: `http://localhost:8080/swagger-ui.html`
+
+Se alguma porta já estiver em uso, ajuste antes de subir:
+
+```bash
+BACKEND_PORT=8081 FRONTEND_PORT=3001 VITE_API_URL=http://localhost:8081 docker compose up --build
+```
+
+Por padrão, o frontend em Docker usa `VITE_API_URL=http://localhost:8080`.
+Se quiser apontar para outra API, defina a variável antes de subir os containers:
+
+```bash
+VITE_API_URL=https://sua-api.exemplo.com docker compose up --build
+```
+
+## Deploy do Frontend na Vercel
+
+No projeto da Vercel (pasta `ProSigaa/`), configure a variável de ambiente:
+
+- `VITE_API_URL=https://<URL-DO-SEU-BACKEND>`
+
+Sem essa variável em produção, o frontend usa `/api` como fallback.
+Se quiser usar esse fallback, você pode configurar rewrites/proxy na plataforma de deploy.
