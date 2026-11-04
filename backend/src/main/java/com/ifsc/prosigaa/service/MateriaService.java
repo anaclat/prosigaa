@@ -5,6 +5,7 @@ import com.ifsc.prosigaa.model.Materia;
 import com.ifsc.prosigaa.repository.FaseRepository;
 import com.ifsc.prosigaa.repository.MateriaRepository;
 import org.springframework.stereotype.Service;
+import com.ifsc.prosigaa.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class MateriaService {
 
     public Materia cadastrar(String nome, String codigo, Long faseId) {
         Fase fase = faseRepository.findById(faseId)
-                .orElseThrow(() -> new IllegalArgumentException("Fase não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Fase não encontrada."));
 
         Materia materia = new Materia(nome, codigo);
         materia.getFases().add(fase);
@@ -38,6 +39,6 @@ public class MateriaService {
 
     public Materia buscar(Long id) {
         return materiaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Matéria não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Matéria não encontrada."));
     }
 }

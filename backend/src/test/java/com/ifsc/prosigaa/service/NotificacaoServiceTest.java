@@ -29,8 +29,8 @@ class NotificacaoServiceTest {
 
         var notificacao = ArgumentCaptor.forClass(NotificacaoDTO.class);
         verify(messagingTemplate).convertAndSend(
-                eq("/topic/usuarios/42/notifications"),
-                notificacao.capture()
+        eq("/topic/usuarios/42/notifications"),
+        notificacao.capture()
         );
         assertEquals(TipoNotificacao.CURTIDA, notificacao.getValue().tipoNotificacao());
         assertEquals(7L, notificacao.getValue().postagemId());

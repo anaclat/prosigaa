@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface FaseRepository extends JpaRepository<Fase, Long> {
     Optional<Fase> findByNumero(int numero);
+
     List<Fase> findAllByOrderByNumeroAsc();
 }

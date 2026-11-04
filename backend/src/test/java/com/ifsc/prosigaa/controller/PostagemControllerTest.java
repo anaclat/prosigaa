@@ -47,8 +47,8 @@ class PostagemControllerTest {
         when(postagemService.listar(null, null)).thenReturn(List.of());
 
         mockMvc.perform(get("/postagem"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
     }
 
     @Test
@@ -60,7 +60,7 @@ class PostagemControllerTest {
         when(postagemService.toDTO(postagemMock)).thenReturn(dtoMock);
 
         mockMvc.perform(get("/postagem/1"))
-                .andExpect(status().isOk());
+        .andExpect(status().isOk());
     }
 
     @Test
@@ -71,9 +71,9 @@ class PostagemControllerTest {
         when(postagemService.cadastrar(any(CadastroPostagemDTO.class))).thenReturn(dtoRetornoMock);
 
         mockMvc.perform(post("/postagem")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isCreated());
     }
 
     @Test
@@ -88,8 +88,8 @@ class PostagemControllerTest {
         when(postagemService.toDTO(postagemMock)).thenReturn(dtoRetornoMock);
 
         mockMvc.perform(post("/postagem/1/comentario")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isCreated());
     }
 }

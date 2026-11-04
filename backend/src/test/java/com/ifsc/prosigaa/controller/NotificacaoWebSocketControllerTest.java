@@ -30,11 +30,11 @@ class NotificacaoWebSocketControllerTest {
     @Test
     void deveEnviarNotificacaoDeTesteParaCanalPublico() throws Exception {
         mockMvc.perform(post("/api/test/notify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"mensagem\":\"Teste de notificação\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("enviado"))
-                .andExpect(jsonPath("$.mensagem").value("Teste de notificação"));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"mensagem\":\"Teste de notificação\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("enviado"))
+        .andExpect(jsonPath("$.mensagem").value("Teste de notificação"));
 
         verify(messagingTemplate).convertAndSend(eq("/topic/notifications"), org.mockito.ArgumentMatchers.<Object>any());
     }
@@ -42,15 +42,15 @@ class NotificacaoWebSocketControllerTest {
     @Test
     void deveEnviarNotificacaoDeTesteParaCanalDoUsuarioInformado() throws Exception {
         mockMvc.perform(post("/api/test/notify")
-                        .param("userId", "10")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"mensagem\":\"Teste para o usuário\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("enviado"));
+        .param("userId", "10")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"mensagem\":\"Teste para o usuário\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("enviado"));
 
         verify(messagingTemplate).convertAndSend(
-                eq("/topic/usuarios/10/notifications"),
-                org.mockito.ArgumentMatchers.<Object>any()
+        eq("/topic/usuarios/10/notifications"),
+        org.mockito.ArgumentMatchers.<Object>any()
         );
     }
 }

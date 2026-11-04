@@ -9,6 +9,8 @@ Backend REST do ProSIGAA, uma aplicação acadêmica para estudantes e professor
 - Gradle Wrapper
 - Spring Web (REST)
 - Spring Data JPA / Hibernate
+- Spring Security Crypto (BCrypt para hashes de senha)
+- Spring Security Crypto (BCrypt para hashes de senha)
 - H2 (banco relacional em arquivo)
 - springdoc-openapi / Swagger UI
 - Spring WebSocket
@@ -78,23 +80,21 @@ Os testes usam banco H2 em memória, isolado do banco local. O relatório fica e
 
 ## Principais endpoints
 
+As rotas canônicas usam recursos no plural. A tabela completa, payloads e respostas estão em [`docs/API_REST.md`](docs/API_REST.md).
+
 | Método | Caminho | Função |
 |---|---|---|
-| GET | `/usuario` | Lista usuários |
-| POST | `/usuario/cadastro` | Cadastra usuário institucional |
-| POST | `/usuario/login` | Autentica usuário (protótipo) |
-| GET | `/fase` | Lista fases e matérias associadas |
-| POST | `/fase` | Cadastra fase |
-| GET | `/materia` | Lista matérias; aceita `?faseId=` |
-| POST | `/materia` | Cadastra matéria associada a uma fase |
-| GET | `/postagem` | Lista postagens; aceita `?faseId=` e/ou `?materiaId=` |
-| GET | `/postagem/{id}` | Consulta uma postagem |
-| POST | `/postagem` | Cria postagem |
-| POST | `/postagem/{id}/comentario` | Comenta em uma postagem |
-| POST | `/curtida/postagem/{postagemId}?usuarioId={id}` | Curte uma postagem |
-| POST | `/curtida/comentario/{comentarioId}?usuarioId={id}` | Curte um comentário |
+| POST / GET | `/usuarios` | Cadastrar / listar dados resumidos de usuários |
+| POST | `/usuarios/sessao` | Autenticar usuário |
+| GET / POST | `/fases` | Consultar / cadastrar fases |
+| GET / POST | `/materias` | Consultar / cadastrar matérias |
+| GET / POST | `/postagens` | Consultar / publicar postagens |
+| GET / DELETE | `/postagens/{id}` | Consultar / excluir postagem |
+| POST / DELETE | `/postagens/{id}/comentarios` e `/postagens/comentarios/{id}` | Comentar / excluir comentário |
+| POST / DELETE | `/curtidas/postagens/{id}` | Curtir / remover curtida de postagem |
+| POST / DELETE | `/curtidas/comentarios/{id}` | Curtir / remover curtida de comentário |
 
-Consulte o Swagger para os schemas e exemplos dos DTOs. Os enums aceitos estão em `src/main/java/com/ifsc/prosigaa/enums`.
+A interface Swagger está em `/swagger-ui.html`; o contrato OpenAPI JSON em `/v3/api-docs`.
 
 ## Exemplo de cadastro
 
@@ -102,12 +102,12 @@ Consulte o Swagger para os schemas e exemplos dos DTOs. Os enums aceitos estão 
 {
   "nome": "Maria da Silva",
   "email": "maria@ifsc.edu.br",
-  "senha": "senha-de-exemplo",
+  "senha": "SenhaSegura123",
   "tipo": "ALUNO"
 }
 ```
 
-Use `POST /usuario/cadastro`. Os tipos disponíveis devem corresponder ao enum `TipoUsuario`.
+Use `POST /usuarios`. A senha deve possuir ao menos oito caracteres e é armazenada com BCrypt. Os tipos disponíveis estão no enum `TipoUsuario`.
 
 ## Arquitetura
 
@@ -122,7 +122,7 @@ A aplicação segue organização em camadas:
 
 ## Limitações do protótipo
 
-O login atual é uma autenticação demonstrativa, não um mecanismo de segurança de produção. Antes de publicar o sistema, implementar hash de senhas (por exemplo BCrypt), autenticação/autorização (por exemplo Spring Security + JWT), validação de entrada mais completa, política de CORS por ambiente, migrações de banco (Flyway/Liquibase), paginação e logs/auditoria. O banco H2 em arquivo atende à demonstração; produção deve usar banco gerenciado e credenciais via variáveis de ambiente.
+A autenticação ainda é demonstrativa e não emite token nem implementa autorização por perfil. Antes de publicar o sistema, implementar autenticação/autorização (por exemplo Spring Security + JWT), validação de entrada mais completa, política de CORS por ambiente, migrações de banco (Flyway/Liquibase), paginação e logs/auditoria. Senhas novas são armazenadas com BCrypt; credenciais legadas em texto puro são convertidas para BCrypt após o primeiro login válido. O banco H2 em arquivo atende à demonstração; produção deve usar banco gerenciado e credenciais via variáveis de ambiente.
 
 ## Documentação da iteração
 

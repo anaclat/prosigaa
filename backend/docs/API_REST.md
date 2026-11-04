@@ -1,52 +1,81 @@
-# Especificação da API REST
+# API REST — ProSIGAA
 
-A especificação OpenAPI é gerada a partir da aplicação e dos DTOs. Com o backend em execução:
+A especificação interativa está disponível em `/swagger-ui.html`; o documento OpenAPI JSON em `/v3/api-docs`.
 
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+## Convenções
 
-Todos os corpos são JSON salvo indicação em contrário. IDs são numéricos (`Long`). Respostas de erro do `ApiExceptionHandler` seguem `{ "erro": "mensagem" }` para `IllegalArgumentException`.
+- Base local padrão: `http://localhost:8080`.
+- Requisições e respostas usam JSON, exceto respostas `204 No Content`.
+- Recursos canônicos no plural: `/usuarios`, `/postagens`, `/fases`, `/materias`, `/curtidas`.
+- Identificadores de ações de escrita são enviados no corpo JSON, nunca em query string.
+- `400`: entrada inválida/credenciais inválidas; `404`: recurso inexistente; `409`: conflito/integridade; `500`: erro inesperado.
+- Respostas de criação usam `201 Created`; exclusões definitivas usam `204 No Content`.
 
-## Recursos e operações
+## Endpoints
 
-| Recurso | Operação | Entrada relevante | Resposta esperada |
+| Método | URI | Descrição | Sucesso |
 |---|---|---|---|
-| Usuário | `GET /usuario` | — | Lista de usuários sem senha |
-| Usuário | `POST /usuario/cadastro` | `CadastroUsuarioDTO` | Usuário criado (DTO público) |
-| Usuário | `POST /usuario/login` | `LoginDTO` | Usuário autenticado (DTO público) |
-| Fase | `GET /fase` | — | Fases com matérias |
-| Fase | `POST /fase` | `CadastroFaseDTO` | Fase cadastrada |
-| Matéria | `GET /materia?faseId={id}` | filtro opcional | Lista de matérias |
-| Matéria | `POST /materia` | `CadastroMateriaDTO` | Matéria cadastrada |
-| Postagem | `GET /postagem?faseId={id}&materiaId={id}` | filtros opcionais | Lista de postagens |
-| Postagem | `GET /postagem/{id}` | path ID | Detalhe com comentários e curtidas |
-| Postagem | `POST /postagem` | `CadastroPostagemDTO` | Postagem criada |
-| Comentário | `POST /postagem/{id}/comentario` | `CadastroComentarioDTO` | Postagem atualizada |
-| Curtida | `POST /curtida/postagem/{postagemId}?usuarioId={id}` | IDs | Mensagem de confirmação |
-| Curtida | `POST /curtida/comentario/{comentarioId}?usuarioId={id}` | IDs | Mensagem de confirmação |
+| POST | `/usuarios` | Cadastrar usuário | 201 |
+| GET | `/usuarios` | Listar dados públicos dos usuários | 200 |
+| POST | `/usuarios/sessao` | Autenticar usuário | 200 |
+| GET | `/fases` | Listar fases e matérias | 200 |
+| POST | `/fases` | Cadastrar fase | 201 |
+| GET | `/materias?faseId={id}` | Listar/filtrar matérias | 200 |
+| POST | `/materias` | Cadastrar matéria | 201 |
+| GET | `/postagens?faseId={id}&materiaId={id}` | Listar/filtrar postagens | 200 |
+| GET | `/postagens/{id}` | Consultar postagem | 200 |
+| POST | `/postagens` | Publicar postagem | 201 |
+| DELETE | `/postagens/{id}` | Excluir postagem | 204 |
+| POST | `/postagens/{id}/comentarios` | Comentar postagem | 201 |
+| DELETE | `/postagens/comentarios/{comentarioId}` | Excluir comentário | 204 |
+| POST | `/curtidas/postagens/{postagemId}` | Curtir postagem | 201 |
+| DELETE | `/curtidas/postagens/{postagemId}` | Remover curtida da postagem | 200 |
+| POST | `/curtidas/comentarios/{comentarioId}` | Curtir comentário | 201 |
+| DELETE | `/curtidas/comentarios/{comentarioId}` | Remover curtida do comentário | 200 |
 
-As respostas de postagem incluem a contagem `curtidas`; cada item de `comentarios` também inclui `curtidas` para exibir a contagem no feed.
+## Exemplos de payload
 
-## Códigos HTTP
-
-- `200 OK`: consulta ou operação concluída.
-- `400 Bad Request`: validação/regra de negócio representada por `IllegalArgumentException`.
-- `404 Not Found`: o comportamento atual de IDs inexistentes é convertido em 400 pelo handler global; recomenda-se separar `EntityNotFoundException` e mapear para 404 em evolução futura.
-
-## Exemplo de publicação
-
-`POST /postagem`
+### Cadastro — `POST /usuarios`
 
 ```json
 {
-  "titulo": "Dúvida sobre listas encadeadas",
-  "conteudo": "Alguém pode indicar material de estudo?",
-  "urlImagem": null,
-  "tipo": "DUVIDA",
-  "usuarioId": 2,
-  "faseId": 1,
-  "materiaId": 1
+  "nome": "Maria Silva",
+  "email": "maria@ifsc.edu.br",
+  "senha": "SenhaSegura123",
+  "tipo": "ALUNO"
 }
 ```
 
-Os valores de enum e campos obrigatórios devem ser confirmados no Swagger/DTOs da versão executada.
+Senha mínima de oito caracteres. A resposta não inclui senha nem hash.
+
+### Login — `POST /usuarios/sessao`
+
+```json
+{ "email": "maria@ifsc.edu.br", "senha": "SenhaSegura123" }
+```
+
+### Curtir — `POST /curtidas/postagens/10`
+
+```json
+{ "usuarioId": 2 }
+```
+
+### Descurtir — `DELETE /curtidas/postagens/10`
+
+```json
+{ "usuarioId": 2 }
+```
+
+### Comentar — `POST /postagens/10/comentarios`
+
+```json
+{ "conteudo": "Ótima explicação!", "usuarioId": 2 }
+```
+
+## Compatibilidade
+
+As rotas antigas no singular (`/postagem`, `/fase`, `/materia`, `/usuario`) e os caminhos `/usuario/cadastro` e `/usuario/login` permanecem como aliases temporários. Novos clientes devem utilizar exclusivamente as rotas plurais desta documentação. O antigo formato de curtida com `usuarioId` na query string não é mantido: envie o identificador no corpo JSON.
+
+## Segurança e limitações
+
+A senha é armazenada com BCrypt. O endpoint de listagem retorna apenas `UsuarioDTO` público. O protótipo ainda não possui JWT/sessão persistente nem autorização por papel; por isso, os identificadores de usuário no corpo representam uma simplificação didática, não uma autenticação segura para produção. A listagem de usuários deve ser protegida por autenticação e autorização antes de implantação pública.

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,13 +20,13 @@ class UsuarioServiceTest {
 
     @BeforeEach
     void configurar() {
-        usuarioService = new UsuarioService(usuarioRepository);
+        usuarioService = new UsuarioService(usuarioRepository, new BCryptPasswordEncoder());
     }
 
     @Test
     void deveRejeitarCadastroComEmailForaDoDominioInstitucional() {
         assertThrows(IllegalArgumentException.class,
-                () -> usuarioService.cadastrar("Teste", "teste@gmail.com", "123456", null));
+        () -> usuarioService.cadastrar("Teste", "teste@gmail.com", "123456", null));
         verifyNoInteractions(usuarioRepository);
     }
 }

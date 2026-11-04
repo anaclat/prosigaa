@@ -1,47 +1,76 @@
 package com.ifsc.prosigaa.controller;
 
-import com.ifsc.prosigaa.dto.CadastroComentarioDTO;
-import com.ifsc.prosigaa.dto.CadastroPostagemDTO;
-import com.ifsc.prosigaa.dto.PostagemDTO;
-import com.ifsc.prosigaa.model.Comentario;
-import com.ifsc.prosigaa.service.ComentarioService;
-import com.ifsc.prosigaa.service.PostagemService;
+import com.ifsc.prosigaa.dto.*;
+import com.ifsc.prosigaa.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/postagem")
+@RequestMapping({"/postagens", "/postagem"})
+@Tag(name = "Postagens", description = "Publicações e comentários acadêmicos")
 public class PostagemController {
     private final PostagemService postagemService;
     private final ComentarioService comentarioService;
 
-    public PostagemController(PostagemService postagemService, ComentarioService comentarioService) {
-        this.postagemService = postagemService;
-        this.comentarioService = comentarioService;
+    public PostagemController(PostagemService p, ComentarioService c) {
+        postagemService = p;
+        comentarioService = c;
     }
 
     @GetMapping
-    public List<PostagemDTO> listar(
-            @RequestParam(required = false) Long faseId,
-            @RequestParam(required = false) Long materiaId) {
+    @Operation(summary = "Listar postagens", description = "Permite filtrar por faseId e/ou materiaId.")
+    @ApiResponse(responseCode = "200", description = "Postagens encontradas")
+    public List<PostagemDTO> listar(@RequestParam(required = false) Long faseId, @RequestParam(required = false) Long materiaId) {
         return postagemService.listar(faseId, materiaId);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Consultar postagem")
+    @ApiResponse(responseCode = "404", description = "Postagem não encontrada")
     public PostagemDTO buscar(@PathVariable Long id) {
         return postagemService.toDTO(postagemService.buscar(id));
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Criar postagem")
+    @ApiResponse(responseCode = "201", description = "Postagem criada")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
     public PostagemDTO cadastrar(@RequestBody CadastroPostagemDTO dto) {
         return postagemService.cadastrar(dto);
     }
 
-    @PostMapping("/{id}/comentario")
+    @PostMapping({"/{id}/comentarios", "/{id}/comentario"})
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Comentar uma postagem")
+    @ApiResponse(responseCode = "201", description = "Comentário criado")
+    @ApiResponse(responseCode = "404", description = "Postagem ou usuário não encontrado")
     public PostagemDTO comentar(@PathVariable Long id, @RequestBody CadastroComentarioDTO dto) {
         comentarioService.cadastrar(id, dto);
         return postagemService.toDTO(postagemService.buscar(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Excluir postagem")
+    @ApiResponse(responseCode = "204", description = "Postagem excluída")
+    @ApiResponse(responseCode = "404", description = "Postagem não encontrada")
+    public void excluir(@PathVariable Long id) {
+        postagemService.excluir(id);
+    }
+
+    @DeleteMapping("/comentarios/{comentarioId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Excluir comentário")
+    @ApiResponse(responseCode = "204", description = "Comentário excluído")
+    @ApiResponse(responseCode = "404", description = "Comentário não encontrado")
+    public void excluirComentario(@PathVariable Long comentarioId) {
+        comentarioService.excluir(comentarioId);
     }
 }

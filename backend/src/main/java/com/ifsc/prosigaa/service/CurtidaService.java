@@ -3,6 +3,7 @@ package com.ifsc.prosigaa.service;
 import com.ifsc.prosigaa.model.*;
 import com.ifsc.prosigaa.repository.*;
 import org.springframework.stereotype.Service;
+import com.ifsc.prosigaa.exception.ResourceNotFoundException;
 
 @Service
 public class CurtidaService {
@@ -46,7 +47,7 @@ public class CurtidaService {
         if (curtidaComentarioRepository.existsByUsuarioIdAndComentarioId(usuarioId, comentarioId)) return;
         Usuario usuario = usuarioService.buscar(usuarioId);
         Comentario comentario = comentarioRepository.findById(comentarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Comentário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado."));
         curtidaComentarioRepository.save(new CurtidaComentario(usuario, comentario));
 
         if (!comentario.getUsuario().getId().equals(usuario.getId())) {
@@ -57,4 +58,17 @@ public class CurtidaService {
             );
         }
     }
+
+    public void descurtirPostagem(Long postagemId, Long usuarioId) {
+        postagemService.buscar(postagemId);
+        usuarioService.buscar(usuarioId);
+        curtidaPostagemRepository.deleteByUsuarioIdAndPostagemId(usuarioId, postagemId);
+    }
+
+    public void descurtirComentario(Long comentarioId, Long usuarioId) {
+        comentarioRepository.findById(comentarioId).orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado."));
+        usuarioService.buscar(usuarioId);
+        curtidaComentarioRepository.deleteByUsuarioIdAndComentarioId(usuarioId, comentarioId);
+    }
+
 }

@@ -36,10 +36,10 @@ class UsuarioControllerTest {
         when(usuarioService.login("teste@ifsc.edu.br", "123456")).thenReturn(usuarioMock);
 
         mockMvc.perform(post("/usuario/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("teste@ifsc.edu.br"));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(loginDTO)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value("teste@ifsc.edu.br"));
     }
 
     @Test
@@ -47,12 +47,12 @@ class UsuarioControllerTest {
         LoginDTO loginDTO = new LoginDTO("invalido@ifsc.edu.br", "000");
 
         when(usuarioService.login("invalido@ifsc.edu.br", "000"))
-                .thenThrow(new IllegalArgumentException("Credenciais inválidas."));
+        .thenThrow(new IllegalArgumentException("Credenciais inválidas."));
 
         mockMvc.perform(post("/usuario/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.erro").value("Credenciais inválidas."));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(loginDTO)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.erro").value("Credenciais inválidas."));
     }
 }

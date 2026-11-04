@@ -5,6 +5,7 @@ import com.ifsc.prosigaa.enums.TipoPostagem;
 import com.ifsc.prosigaa.model.*;
 import com.ifsc.prosigaa.repository.PostagemRepository;
 import org.springframework.stereotype.Service;
+import com.ifsc.prosigaa.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class PostagemService {
 
     public Postagem buscar(Long id) {
         return postagemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Postagem não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Postagem não encontrada."));
     }
 
     public PostagemDTO toDTO(Postagem p) {
@@ -97,4 +98,10 @@ public class PostagemService {
             throw new IllegalArgumentException("Usuário, fase e matéria são obrigatórios.");
         }
     }
+
+    public void excluir(Long id) {
+        Postagem postagem = buscar(id);
+        postagemRepository.delete(postagem);
+    }
+
 }

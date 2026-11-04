@@ -37,8 +37,8 @@ class MateriaControllerTest {
         when(materiaService.listar(1L)).thenReturn(List.of());
 
         mockMvc.perform(get("/materia").param("faseId", "1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
     }
 
     @Test
@@ -53,10 +53,10 @@ class MateriaControllerTest {
         when(materiaService.cadastrar("Matemática", "MAT101", 1L)).thenReturn(materiaMock);
 
         mockMvc.perform(post("/materia")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(10))
-                .andExpect(jsonPath("$.nome").value("Matemática"));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(10))
+        .andExpect(jsonPath("$.nome").value("Matemática"));
     }
 }

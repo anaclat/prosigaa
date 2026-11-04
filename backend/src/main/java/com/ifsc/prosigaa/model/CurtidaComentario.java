@@ -18,7 +18,8 @@ public class CurtidaComentario {
     @ManyToOne(optional = false)
     private Comentario comentario;
 
-    protected CurtidaComentario() {}
+    protected CurtidaComentario() {
+    }
 
     public CurtidaComentario(Usuario usuario, Comentario comentario) {
         this.usuario = usuario;
@@ -26,8 +27,19 @@ public class CurtidaComentario {
         this.criadoEm = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public LocalDateTime getCriadoEm() { return criadoEm; }
-    public Usuario getUsuario() { return usuario; }
-    public Comentario getComentario() { return comentario; }
+    public Long getId() {
+        return id;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public Comentario getComentario() {
+        return comentario;
+    }
 }

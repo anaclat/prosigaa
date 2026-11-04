@@ -1,32 +1,56 @@
 package com.ifsc.prosigaa.controller;
 
+import com.ifsc.prosigaa.dto.CurtidaDTO;
 import com.ifsc.prosigaa.service.CurtidaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/curtida")
+@RequestMapping("/curtidas")
+@Tag(name = "Curtidas")
 public class CurtidaController {
-    private final CurtidaService curtidaService;
+    private final CurtidaService service;
 
-    public CurtidaController(CurtidaService curtidaService) {
-        this.curtidaService = curtidaService;
+    public CurtidaController(CurtidaService service) {
+        this.service = service;
     }
 
-    @PostMapping("/postagem/{postagemId}")
-    public Map<String, String> curtirPostagem(
-            @PathVariable Long postagemId,
-            @RequestParam Long usuarioId) {
-        curtidaService.curtirPostagem(postagemId, usuarioId);
+    @PostMapping("/postagens/{postagemId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Curtir postagem", description = "O usuário autor da ação é informado no corpo JSON.")
+    @ApiResponse(responseCode = "201", description = "Curtida registrada")
+    @ApiResponse(responseCode = "404", description = "Postagem ou usuário inexistente")
+    public Map<String, String> curtirPostagem(@PathVariable Long postagemId, @RequestBody CurtidaDTO dto) {
+        service.curtirPostagem(postagemId, dto.usuarioId());
         return Map.of("mensagem", "Postagem curtida.");
     }
 
-    @PostMapping("/comentario/{comentarioId}")
-    public Map<String, String> curtirComentario(
-            @PathVariable Long comentarioId,
-            @RequestParam Long usuarioId) {
-        curtidaService.curtirComentario(comentarioId, usuarioId);
+    @PostMapping("/comentarios/{comentarioId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Curtir comentário")
+    @ApiResponse(responseCode = "201", description = "Curtida registrada")
+    @ApiResponse(responseCode = "404", description = "Comentário ou usuário inexistente")
+    public Map<String, String> curtirComentario(@PathVariable Long comentarioId, @RequestBody CurtidaDTO dto) {
+        service.curtirComentario(comentarioId, dto.usuarioId());
         return Map.of("mensagem", "Comentário curtido.");
+    }
+
+    @DeleteMapping("/postagens/{postagemId}")
+    @Operation(summary = "Remover curtida de postagem")
+    public Map<String, String> descurtirPostagem(@PathVariable Long postagemId, @RequestBody CurtidaDTO dto) {
+        service.descurtirPostagem(postagemId, dto.usuarioId());
+        return Map.of("mensagem", "Curtida removida.");
+    }
+
+    @DeleteMapping("/comentarios/{comentarioId}")
+    @Operation(summary = "Remover curtida de comentário")
+    public Map<String, String> descurtirComentario(@PathVariable Long comentarioId, @RequestBody CurtidaDTO dto) {
+        service.descurtirComentario(comentarioId, dto.usuarioId());
+        return Map.of("mensagem", "Curtida removida.");
     }
 }

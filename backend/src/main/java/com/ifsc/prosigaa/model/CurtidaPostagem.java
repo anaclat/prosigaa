@@ -18,7 +18,8 @@ public class CurtidaPostagem {
     @ManyToOne(optional = false)
     private Postagem postagem;
 
-    protected CurtidaPostagem() {}
+    protected CurtidaPostagem() {
+    }
 
     public CurtidaPostagem(Usuario usuario, Postagem postagem) {
         this.usuario = usuario;
@@ -26,8 +27,19 @@ public class CurtidaPostagem {
         this.criadoEm = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public LocalDateTime getCriadoEm() { return criadoEm; }
-    public Usuario getUsuario() { return usuario; }
-    public Postagem getPostagem() { return postagem; }
+    public Long getId() {
+        return id;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public Postagem getPostagem() {
+        return postagem;
+    }
 }

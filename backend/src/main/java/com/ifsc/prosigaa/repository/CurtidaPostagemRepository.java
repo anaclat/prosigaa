@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CurtidaPostagemRepository extends JpaRepository<CurtidaPostagem, Long> {
     boolean existsByUsuarioIdAndPostagemId(Long usuarioId, Long postagemId);
+
+    void deleteByUsuarioIdAndPostagemId(Long usuarioId, Long postagemId);
 }

@@ -51,14 +51,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
         registry.addEndpoint("/ws")
-            .setAllowedOriginPatterns(parseAllowedOriginPatterns())
+                .setAllowedOriginPatterns(parseAllowedOriginPatterns())
                 .withSockJS();
     }
 
-        private String[] parseAllowedOriginPatterns() {
+    private String[] parseAllowedOriginPatterns() {
         return Arrays.stream(allowedOriginPatterns.split(","))
-            .map(String::trim)
-            .filter(pattern -> !pattern.isEmpty())
-            .toArray(String[]::new);
-        }
+                .map(String::trim)
+                .filter(pattern -> !pattern.isEmpty())
+                .toArray(String[]::new);
+    }
 }

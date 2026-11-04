@@ -1,10 +1,13 @@
 package com.ifsc.prosigaa.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import com.ifsc.prosigaa.enums.TipoPostagem;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Schema(description = "Representação de postagem com autor, classificação, comentários e contagem de curtidas.")
 public record PostagemDTO(
         Long id,
         String titulo,
@@ -17,4 +20,5 @@ public record PostagemDTO(
         MateriaDTO materia,
         List<ComentarioDTO> comentarios,
         int curtidas
-) {}
+) {
+}

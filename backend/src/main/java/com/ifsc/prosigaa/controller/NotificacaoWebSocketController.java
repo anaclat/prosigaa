@@ -1,6 +1,9 @@
 package com.ifsc.prosigaa.controller;
 
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +14,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/test")
+@Tag(name = "Notificações", description = "Envio de notificações de teste por WebSocket")
 @RequiredArgsConstructor
 public class NotificacaoWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/notify")
+    @Operation(summary = "Enviar notificação de teste", description = "Publica uma notificação em tópico geral ou no tópico de um usuário.")
+    @ApiResponse(responseCode = "200", description = "Notificação enviada")
     public ResponseEntity<Map<String, Object>> enviarNotificacaoTeste(
             @RequestParam(required = false) Long userId,
             @RequestBody(required = false) Map<String, Object> payload) {

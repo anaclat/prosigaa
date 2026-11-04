@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface MateriaRepository extends JpaRepository<Materia, Long> {
     List<Materia> findByFasesId(Long faseId);
+
     Optional<Materia> findByNome(String nome);
 }

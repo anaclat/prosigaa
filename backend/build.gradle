@@ -21,6 +21,7 @@ dependencies {
     // Web e Persistência de Dados (JPA + H2)
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.security:spring-security-crypto'
     runtimeOnly 'com.h2database:h2'
 
     // Ferramentas de Desenvolvimento

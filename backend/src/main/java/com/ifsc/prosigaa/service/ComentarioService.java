@@ -46,4 +46,11 @@ public class ComentarioService {
 
         return comentario;
     }
+
+    public void excluir(Long comentarioId) {
+        Comentario comentario = comentarioRepository.findById(comentarioId)
+                .orElseThrow(() -> new com.ifsc.prosigaa.exception.ResourceNotFoundException("Comentário não encontrado."));
+        comentarioRepository.delete(comentario);
+    }
+
 }

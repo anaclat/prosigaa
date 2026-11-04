@@ -15,6 +15,7 @@ import com.ifsc.prosigaa.repository.UsuarioRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
@@ -124,19 +125,22 @@ public class DadosIniciais implements ApplicationRunner {
     private final UsuarioRepository usuarios;
     private final PostagemRepository postagens;
     private final ComentarioRepository comentarios;
+    private final PasswordEncoder passwordEncoder;
 
     public DadosIniciais(
             FaseRepository fases,
             MateriaRepository materias,
             UsuarioRepository usuarios,
             PostagemRepository postagens,
-            ComentarioRepository comentarios
+            ComentarioRepository comentarios,
+            PasswordEncoder passwordEncoder
     ) {
         this.fases = fases;
         this.materias = materias;
         this.usuarios = usuarios;
         this.postagens = postagens;
         this.comentarios = comentarios;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -226,7 +230,7 @@ public class DadosIniciais implements ApplicationRunner {
 
     private Usuario garantirUsuarioPadrao(String nome, String email, TipoUsuario tipo) {
         return usuarios.findByEmail(email)
-                .orElseGet(() -> usuarios.save(new Usuario(nome, email, "123456", tipo)));
+                .orElseGet(() -> usuarios.save(new Usuario(nome, email, passwordEncoder.encode("ProSigaa@123"), tipo)));
     }
 
     private Usuario usuarioInicial(String nome, TipoUsuario tipo) {
@@ -237,10 +241,11 @@ public class DadosIniciais implements ApplicationRunner {
                 .replaceAll("(^-|-$)", "");
         String email = "seed." + slug + "@prosigaa.local";
         return usuarios.findByEmail(email)
-                .orElseGet(() -> usuarios.save(new Usuario(nome, email, UUID.randomUUID().toString(), tipo)));
+                .orElseGet(() -> usuarios.save(new Usuario(nome, email, passwordEncoder.encode(UUID.randomUUID().toString()), tipo)));
     }
 
-    private record PeriodoInicial(int numero, String nome, List<String> materias) {}
+    private record PeriodoInicial(int numero, String nome, List<String> materias) {
+    }
 
     private record PostagemInicial(
             String titulo,
@@ -250,7 +255,9 @@ public class DadosIniciais implements ApplicationRunner {
             String materia,
             String autor,
             List<ComentarioInicial> comentarios
-    ) {}
+    ) {
+    }
 
-    private record ComentarioInicial(String conteudo, String autor, boolean professor) {}
+    private record ComentarioInicial(String conteudo, String autor, boolean professor) {
+    }
 }

@@ -39,7 +39,7 @@ class FaseControllerTest {
         when(faseService.listar()).thenReturn(dtoMock);
 
         mockMvc.perform(get("/fase"))
-                .andExpect(status().isOk());
+        .andExpect(status().isOk());
     }
 
     @Test
@@ -54,10 +54,10 @@ class FaseControllerTest {
         when(faseService.cadastrar("Fase 1", 1)).thenReturn(faseMock);
 
         mockMvc.perform(post("/fase")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nome").value("Fase 1"));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.nome").value("Fase 1"));
     }
 }
