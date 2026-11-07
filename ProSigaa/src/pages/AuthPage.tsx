@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Header } from '../components/layout/Header'
 import { API_URL } from '../services/api'
+import logo from '../assets/logo.png'
 
 type AuthMode = 'login' | 'register'
 
@@ -17,11 +18,11 @@ export function AuthPage({ initialMode = 'login' }: { initialMode?: AuthMode }) 
     const payload = mode === 'login'
       ? { email: String(form.get('email')), senha: String(form.get('password')) }
       : {
-          nome: String(form.get('name')),
-          email: String(form.get('email')),
-          senha: String(form.get('password')),
-          tipo: 'ALUNO',
-        }
+        nome: String(form.get('name')),
+        email: String(form.get('email')),
+        senha: String(form.get('password')),
+        tipo: 'ALUNO',
+      }
 
     setIsSubmitting(true)
     setErrorMessage('')
@@ -126,10 +127,14 @@ export function AuthPage({ initialMode = 'login' }: { initialMode?: AuthMode }) 
         <aside className="auth-aside" aria-label="Sobre o ProSigaa">
           <div className="auth-aside-shape auth-aside-shape-one" />
           <div className="auth-aside-shape auth-aside-shape-two" />
-          <span className="auth-aside-symbol" aria-hidden="true">+</span>
+
+          {/* A mágica acontece aqui: d-block e mx-auto centralizam a imagem sozinha */}
+          <img src={logo} alt="Logo ProSIGAA" className="h-30 w-40 d-block mx-auto" />
+
           <p>O conhecimento da sua turma, organizado para continuar ajudando.</p>
           <span className="auth-aside-caption">UM ESPAÇO COLABORATIVO PARA O IFSC</span>
         </aside>
+
       </main>
     </div>
   )

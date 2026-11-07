@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import { useTheme } from '../hooks/useTheme'
@@ -63,36 +63,65 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
 const features: { icon: IconName; title: string; description: string }[] = [
   {
     icon: 'search',
-    title: 'Organização por disciplinas',
+    title: 'Organização por disciplina',
     description:
-      'Encontre dúvidas e conversas organizadas por fase e matéria, sem perder tempo procurando em grupos.',
+      'Dúvidas, materiais e respostas ficam em um lugar só, visíveis para toda a turma.',
   },
   {
     icon: 'badge',
-    title: 'Compartilhamento de materiais',
+    title: 'Materiais compartilhados',
     description:
-      'Compartilhe resumos, links e materiais de estudo com quem está aprendendo os mesmos conteúdos.',
+      'Resumos, links e conteúdos de estudo passam a ser fáceis de encontrar e reutilizar.',
   },
   {
     icon: 'eye',
-    title: 'Rede colaborativa',
+    title: 'Aprendizado em comunidade',
     description:
-      'Faça perguntas, troque experiências e construa um espaço de aprendizagem com a sua turma.',
+      'A colaboração entre estudantes ajuda a resolver dúvidas com mais rapidez e contexto.',
+  },
+]
+
+const heroSlides = [
+  {
+    title: 'Estudo em grupo',
+    description: 'Conecte dúvidas e respostas da turma em um único espaço.',
+    image:
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    title: 'Foco nas disciplinas',
+    description: 'Tudo organizado por fase e matéria para ganhar tempo.',
+    image:
+      'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    title: 'Aprender junto',
+    description: 'Compartilhe materiais e acompanhe o progresso da sua turma.',
+    image:
+      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80',
   },
 ]
 
 export function LandingPage() {
   const { theme, toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSlide, setActiveSlide] = useState(0)
 
   const closeMenu = () => setMenuOpen(false)
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length)
+    }, 4200)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
 
   return (
     <div className="lp-page">
       <header className="lp-header">
         <Link to="/" className="lp-brand" aria-label="ProSigaa, início" onClick={closeMenu}>
           <img src={logo} alt="" />
-          <span>ProSigaa</span>
         </Link>
 
         <nav
@@ -102,7 +131,6 @@ export function LandingPage() {
         >
           <a href="#solucao" onClick={closeMenu}>Como funciona</a>
           <a href="#recursos" onClick={closeMenu}>Recursos</a>
-          <a href="#sobre" onClick={closeMenu}>Sobre o projeto</a>
         </nav>
 
         <div className="lp-header-actions">
@@ -137,11 +165,11 @@ export function LandingPage() {
               FEITO PARA QUEM ESTUDA NO IFSC
             </span>
             <h1 id="lp-hero-title">
-              Diga adeus à bagunça dos <span>grupos de estudo.</span>
+              O lugar certo para <span>estudar em grupo.</span>
             </h1>
             <p>
-              Organize dúvidas, materiais e conversas por disciplina em um só lugar. Estude em comunidade
-              e encontre de novo o que antes se perdia no meio das mensagens.
+              Organize dúvidas, materiais e conversas por disciplina em um só lugar. Menos ruído,
+              mais contexto e muito mais facilidade para aprender junto com a sua turma.
             </p>
             <div className="lp-hero-actions">
               <Link to="/cadastro" className="lp-primary-button">
@@ -155,20 +183,33 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="lp-hero-art" aria-hidden="true">
-            <div className="lp-art-orbit lp-art-orbit-one" />
-            <div className="lp-art-orbit lp-art-orbit-two" />
-            <div className="lp-art-shape lp-art-shape-main">
-              <span className="lp-art-monogram">P</span>
+          <div className="lp-hero-visual" aria-label="Galeria de estudantes estudando">
+            <div className="lp-carousel" role="region" aria-live="polite">
+              {heroSlides.map((slide, index) => (
+                <figure
+                  key={slide.title}
+                  className={`lp-slide ${index === activeSlide ? 'is-active' : ''}`}
+                >
+                  <img src={slide.image} alt={slide.title} />
+                  <figcaption className="lp-slide-caption">
+                    <span>{slide.title}</span>
+                    <small>{slide.description}</small>
+                  </figcaption>
+                </figure>
+              ))}
+
+              <div className="lp-carousel-dots" aria-label="Seleção de slides">
+                {heroSlides.map((slide, index) => (
+                  <button
+                    key={slide.title}
+                    type="button"
+                    className={`lp-carousel-dot ${index === activeSlide ? 'is-active' : ''}`}
+                    onClick={() => setActiveSlide(index)}
+                    aria-label={`Exibir slide ${index + 1}: ${slide.title}`}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="lp-art-shape lp-art-shape-small" />
-            <div className="lp-art-spark lp-art-spark-one">✳</div>
-            <div className="lp-art-spark lp-art-spark-two">✳</div>
-            <div className="lp-art-caption">
-              <span className="lp-art-caption-dot" />
-              Aprender em comunidade
-            </div>
-            <div className="lp-art-index">IFSC <span>·</span> 01—04</div>
           </div>
         </section>
 
@@ -181,11 +222,12 @@ export function LandingPage() {
             <div className="lp-problem-copy">
               <p>
                 Nos grupos de WhatsApp e Telegram, dúvidas importantes desaparecem entre novas
-                mensagens. No ProSigaa, cada contribuição fica salva e organizada por fase e matéria.
+                mensagens. No ProSigaa, cada contribuição fica salva e organizada por disciplina,
+                fase e turma.
               </p>
               <p className="lp-solution-line">
                 <span aria-hidden="true">↗</span>
-                O conhecimento da turma continua ajudando, semestre após semestre.
+                O conhecimento da sua turma continua ajudando semestre após semestre.
               </p>
             </div>
           </div>
@@ -197,7 +239,7 @@ export function LandingPage() {
               <div className="lp-section-kicker">APRENDIZADO COM MAIS CONTEXTO</div>
               <h2 id="lp-features-title">Tudo no lugar certo.</h2>
             </div>
-            <p>Recursos pensados para deixar a colaboração acadêmica mais simples e útil.</p>
+            <p>Ferramentas pensadas para tornar a colaboração acadêmica mais simples e útil.</p>
           </div>
           <div className="lp-feature-grid">
             {features.map((feature, index) => (
@@ -217,7 +259,6 @@ export function LandingPage() {
       <footer className="lp-footer" id="sobre">
         <Link to="/" className="lp-brand lp-footer-brand" aria-label="ProSigaa, início">
           <img src={logo} alt="" />
-          <span>ProSigaa</span>
         </Link>
         <p>Projeto acadêmico desenvolvido no IFSC.</p>
         <span className="lp-copyright">© {new Date().getFullYear()} ProSigaa</span>
