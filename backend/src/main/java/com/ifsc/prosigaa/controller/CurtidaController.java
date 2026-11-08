@@ -68,4 +68,32 @@ public class CurtidaController {
         service.descurtirComentario(comentarioId, dto.usuarioId());
         return Map.of("mensagem", "Curtida removida.");
     }
+
+    @DeleteMapping("/postagens/{postagemId}/usuarios/{usuarioId}")
+    @Operation(summary = "Remover curtida de postagem", description = "Remove a curtida identificada pela postagem e pelo usuário na rota.")
+    @ApiResponse(responseCode = "200", description = "Curtida removida")
+    @ApiResponse(responseCode = "400", description = "Identificador inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    @ApiResponse(responseCode = "404", description = "Postagem ou usuário inexistente", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    public Map<String, String> descurtirPostagem(
+            @PathVariable Long postagemId,
+            @PathVariable Long usuarioId
+    ) {
+        service.descurtirPostagem(postagemId, usuarioId);
+        return Map.of("mensagem", "Curtida removida.");
+    }
+
+    @DeleteMapping("/comentarios/{comentarioId}/usuarios/{usuarioId}")
+    @Operation(summary = "Remover curtida de comentário", description = "Remove a curtida identificada pelo comentário e pelo usuário na rota.")
+    @ApiResponse(responseCode = "200", description = "Curtida removida")
+    @ApiResponse(responseCode = "400", description = "Identificador inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    @ApiResponse(responseCode = "404", description = "Comentário ou usuário inexistente", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    public Map<String, String> descurtirComentario(
+            @PathVariable Long comentarioId,
+            @PathVariable Long usuarioId
+    ) {
+        service.descurtirComentario(comentarioId, usuarioId);
+        return Map.of("mensagem", "Curtida removida.");
+    }
 }

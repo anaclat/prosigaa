@@ -4,6 +4,7 @@ import com.ifsc.prosigaa.model.*;
 import com.ifsc.prosigaa.repository.*;
 import org.springframework.stereotype.Service;
 import com.ifsc.prosigaa.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CurtidaService {
@@ -59,12 +60,14 @@ public class CurtidaService {
         }
     }
 
+    @Transactional
     public void descurtirPostagem(Long postagemId, Long usuarioId) {
         postagemService.buscar(postagemId);
         usuarioService.buscar(usuarioId);
         curtidaPostagemRepository.deleteByUsuarioIdAndPostagemId(usuarioId, postagemId);
     }
 
+    @Transactional
     public void descurtirComentario(Long comentarioId, Long usuarioId) {
         comentarioRepository.findById(comentarioId).orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado."));
         usuarioService.buscar(usuarioId);

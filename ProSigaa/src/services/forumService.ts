@@ -117,3 +117,17 @@ export async function createComment(postId: string | number, payload: { conteudo
   const data = (await response.json()) as BackendPostDTO
   return normalizePost(data)
 }
+
+export async function deletePost(postId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/postagens/${postId}`, { method: 'DELETE' })
+  if (!response.ok) {
+    throw new Error((await response.text()) || 'Não foi possível excluir a postagem.')
+  }
+}
+
+export async function deleteComment(commentId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/postagens/comentarios/${commentId}`, { method: 'DELETE' })
+  if (!response.ok) {
+    throw new Error((await response.text()) || 'Não foi possível excluir o comentário.')
+  }
+}

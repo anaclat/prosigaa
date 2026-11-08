@@ -6,14 +6,18 @@ interface CommentDrawerProps {
   onClose: () => void
   onSubmitComment: (postId: string, content: string) => Promise<void>
   onLikeComment: (commentId: string) => Promise<void>
+  onDeleteComment: (commentId: string) => Promise<void>
 }
 
-export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment }: CommentDrawerProps) {
+export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment, onDeleteComment }: CommentDrawerProps) {
   const [draft, setDraft] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [likingCommentIds, setLikingCommentIds] = useState<string[]>([])
+  const [deletingCommentIds, setDeletingCommentIds] = useState<string[]>([])
+  const [openMenuCommentId, setOpenMenuCommentId] = useState<string | null>(null)
   const [likeError, setLikeError] = useState('')
+  const [deleteError, setDeleteError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -63,6 +67,20 @@ export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment }:
     }
   }
 
+  const handleDeleteComment = async (commentId: string) => {
+    setOpenMenuCommentId(null)
+    if (deletingCommentIds.includes(commentId) || !window.confirm('Excluir este comentário?')) return
+
+    setDeletingCommentIds((current) => [...current, commentId])
+    setDeleteError('')
+    try {
+      await onDeleteComment(commentId)
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Não foi possível excluir o comentário.')
+      setDeletingCommentIds((current) => current.filter((id) => id !== commentId))
+    }
+  }
+
   return (
     <div className="comment-drawer-backdrop" onMouseDown={(event) => {
       if (event.target === event.currentTarget) onClose()
@@ -106,6 +124,31 @@ export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment }:
                       <span className="professor-guarantee">Garantido pelo Professor</span>
                     )}
                     <time>{comment.time}</time>
+                    <div className="overflow-menu">
+                      <button
+                        type="button"
+                        className="overflow-menu-trigger"
+                        aria-label={`Mais opções para o comentário de ${comment.author}`}
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuCommentId === comment.id}
+                        onClick={() => setOpenMenuCommentId((current) => current === comment.id ? null : comment.id)}
+                      >
+                        <span aria-hidden="true">⋯</span>
+                      </button>
+                      {openMenuCommentId === comment.id && (
+                        <div className="overflow-menu-items" role="menu">
+                          <button
+                            type="button"
+                            role="menuitem"
+                            className="overflow-menu-delete"
+                            onClick={() => void handleDeleteComment(comment.id)}
+                            disabled={deletingCommentIds.includes(comment.id)}
+                          >
+                            {deletingCommentIds.includes(comment.id) ? 'Excluindo...' : 'Excluir comentário'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <p>{comment.message}</p>
                   <div className="drawer-comment-actions">
@@ -113,9 +156,9 @@ export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment }:
                       type="button"
                       className={`inline-action like-action comment-like-action ${comment.liked ? 'active' : ''}`}
                       onClick={() => void handleLikeComment(comment.id)}
-                      disabled={Boolean(comment.liked) || likingCommentIds.includes(comment.id)}
+                      disabled={likingCommentIds.includes(comment.id)}
                       aria-pressed={Boolean(comment.liked)}
-                      aria-label={`${comment.liked ? 'Curtido' : 'Curtir'} comentário, ${comment.likes ?? 0} curtidas`}
+                      aria-label={`${comment.liked ? 'Descurtir' : 'Curtir'} comentário, ${comment.likes ?? 0} curtidas`}
                     >
                       <svg aria-hidden="true" viewBox="0 0 24 24">
                         <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
@@ -130,6 +173,7 @@ export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment }:
         </div>
 
         {likeError && <p className="comment-drawer-error" role="alert">{likeError}</p>}
+        {deleteError && <p className="comment-drawer-error" role="alert">{deleteError}</p>}
         <form className="comment-drawer-form" onSubmit={handleSubmit}>
           <label className="visually-hidden" htmlFor="drawer-comment-input">Escreva um comentário</label>
           <input

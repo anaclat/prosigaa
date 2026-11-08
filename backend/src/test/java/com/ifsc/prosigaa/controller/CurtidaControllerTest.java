@@ -8,6 +8,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -48,5 +49,23 @@ class CurtidaControllerTest {
                         .content("{\"usuarioId\":10}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mensagem").value("Curtida removida."));
+    }
+
+    @Test
+    void deveRemoverCurtidaDePostagemSemCorpoNaRequisicao() throws Exception {
+        mockMvc.perform(delete("/curtidas/postagens/1/usuarios/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Curtida removida."));
+
+        verify(curtidaService).descurtirPostagem(1L, 10L);
+    }
+
+    @Test
+    void deveRemoverCurtidaDeComentarioSemCorpoNaRequisicao() throws Exception {
+        mockMvc.perform(delete("/curtidas/comentarios/2/usuarios/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Curtida removida."));
+
+        verify(curtidaService).descurtirComentario(2L, 10L);
     }
 }

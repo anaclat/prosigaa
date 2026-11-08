@@ -4,8 +4,8 @@ import { FiltersSidebar } from '../components/feed/FiltersSidebar'
 import { NewPostForm } from '../components/feed/NewPostForm'
 import { QuestionCard } from '../components/feed/QuestionCard'
 import { Header } from '../components/layout/Header'
-import { getFases, getForumPosts, createComment, createPost } from '../services/forumService'
-import { hasLikedContent, likeComment, likePost, rememberLike } from '../services/likeService'
+import { getFases, getForumPosts, createComment, createPost, deleteComment, deletePost } from '../services/forumService'
+import { forgetLike, hasLikedContent, likeComment, likePost, rememberLike, unlikeComment, unlikePost } from '../services/likeService'
 import type { ForumPhase, ForumPost } from '../interfaces/forum'
 
 export function FeedPage() {
@@ -88,23 +88,49 @@ export function FeedPage() {
       : post))
   }
 
+  const handleDeletePost = async (postId: string) => {
+    const post = posts.find((item) => item.id === postId)
+    if (!post) return
+
+    await deletePost(postId)
+    forgetLike(currentUserId, 'postagem', postId)
+    post.comments.forEach((comment) => forgetLike(currentUserId, 'comentario', comment.id))
+    setPosts((current) => current.filter((item) => item.id !== postId))
+    if (selectedPostId === postId) closeComments()
+  }
+
+  const handleDeleteComment = async (commentId: string) => {
+    await deleteComment(commentId)
+    forgetLike(currentUserId, 'comentario', commentId)
+    setPosts((current) => current.map((post) => ({
+      ...post,
+      comments: post.comments.filter((comment) => comment.id !== commentId),
+    })))
+  }
+
   const handleLikePost = async (postId: string) => {
     if (!Number.isSafeInteger(currentUserId) || currentUserId <= 0) {
       throw new Error('Sua sessão expirou. Entre novamente para curtir.')
     }
 
     const post = posts.find((item) => item.id === postId)
-    if (!post || post.liked) return
+    if (!post) return
+    const wasLiked = Boolean(post.liked)
 
     setPosts((current) => current.map((item) => item.id === postId
-      ? { ...item, liked: true, likesCount: item.likesCount + 1 }
+      ? { ...item, liked: !wasLiked, likesCount: Math.max(0, item.likesCount + (wasLiked ? -1 : 1)) }
       : item))
     try {
-      await likePost(postId, currentUserId)
-      rememberLike(currentUserId, 'postagem', postId)
+      if (wasLiked) {
+        await unlikePost(postId, currentUserId)
+        forgetLike(currentUserId, 'postagem', postId)
+      } else {
+        await likePost(postId, currentUserId)
+        rememberLike(currentUserId, 'postagem', postId)
+      }
     } catch (error) {
       setPosts((current) => current.map((item) => item.id === postId
-        ? { ...item, liked: false, likesCount: Math.max(0, item.likesCount - 1) }
+        ? { ...item, liked: wasLiked, likesCount: Math.max(0, item.likesCount + (wasLiked ? 1 : -1)) }
         : item))
       throw error
     }
@@ -117,25 +143,31 @@ export function FeedPage() {
 
     const post = posts.find((item) => item.comments.some((comment) => comment.id === commentId))
     const comment = post?.comments.find((item) => item.id === commentId)
-    if (!post || !comment || comment.liked) return
+    if (!post || !comment) return
+    const wasLiked = Boolean(comment.liked)
 
     setPosts((current) => current.map((item) => item.id === post.id
       ? {
           ...item,
           comments: item.comments.map((reply) => reply.id === commentId
-            ? { ...reply, liked: true, likes: (reply.likes ?? 0) + 1 }
+            ? { ...reply, liked: !wasLiked, likes: Math.max(0, (reply.likes ?? 0) + (wasLiked ? -1 : 1)) }
             : reply),
         }
       : item))
     try {
-      await likeComment(commentId, currentUserId)
-      rememberLike(currentUserId, 'comentario', commentId)
+      if (wasLiked) {
+        await unlikeComment(commentId, currentUserId)
+        forgetLike(currentUserId, 'comentario', commentId)
+      } else {
+        await likeComment(commentId, currentUserId)
+        rememberLike(currentUserId, 'comentario', commentId)
+      }
     } catch (error) {
       setPosts((current) => current.map((item) => item.id === post.id
         ? {
             ...item,
             comments: item.comments.map((reply) => reply.id === commentId
-              ? { ...reply, liked: false, likes: Math.max(0, (reply.likes ?? 0) - 1) }
+              ? { ...reply, liked: wasLiked, likes: Math.max(0, (reply.likes ?? 0) + (wasLiked ? 1 : -1)) }
               : reply),
           }
         : item))
@@ -204,6 +236,7 @@ export function FeedPage() {
                   post={post}
                   onOpenComments={setSelectedPostId}
                   onLike={handleLikePost}
+                  onDelete={handleDeletePost}
                 />
               ))
             )}
@@ -217,6 +250,7 @@ export function FeedPage() {
           onClose={closeComments}
           onSubmitComment={handleCommentSubmit}
           onLikeComment={handleLikeComment}
+          onDeleteComment={handleDeleteComment}
         />
       )}
     </div>
