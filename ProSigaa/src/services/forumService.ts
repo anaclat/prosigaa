@@ -41,7 +41,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
 }
 
 export async function getForumPosts(): Promise<ForumPost[]> {
-  const response = await fetch(`${API_URL}/postagem`)
+  const response = await fetch(`${API_URL}/postagens`)
   if (!response.ok) {
     throw new Error((await response.text()) || 'Erro ao buscar postagens.')
   }
@@ -50,7 +50,7 @@ export async function getForumPosts(): Promise<ForumPost[]> {
 }
 
 export async function getForumPostById(postId: string): Promise<ForumPost | undefined> {
-  const response = await fetch(`${API_URL}/postagem/${postId}`)
+  const response = await fetch(`${API_URL}/postagens/${postId}`)
   if (!response.ok) {
     throw new Error((await response.text()) || 'Postagem não encontrada.')
   }
@@ -59,7 +59,7 @@ export async function getForumPostById(postId: string): Promise<ForumPost | unde
 }
 
 export async function getFases(): Promise<ForumPhase[]> {
-  const response = await fetch(`${API_URL}/fase`)
+  const response = await fetch(`${API_URL}/fases`)
   if (!response.ok) {
     throw new Error((await response.text()) || 'Erro ao buscar fases e matérias.')
   }
@@ -70,16 +70,12 @@ export async function getFases(): Promise<ForumPhase[]> {
 export async function getMateriasByFase(faseId?: number): Promise<ForumMateria[]> {
   if (!faseId) return []
 
-  try {
-    const response = await fetch(`${API_URL}/materia?faseId=${faseId}`)
-    if (!response.ok) {
-      throw new Error('Erro ao buscar matérias')
-    }
-    const payload = (await response.json()) as ForumMateria[]
-    return payload
-  } catch {
-    return []
+  const response = await fetch(`${API_URL}/materias?faseId=${faseId}`)
+  if (!response.ok) {
+    throw new Error((await response.text()) || 'Erro ao buscar matérias.')
   }
+  const payload = (await response.json()) as ForumMateria[]
+  return payload
 }
 
 export async function createPost(payload: {
@@ -91,7 +87,7 @@ export async function createPost(payload: {
   materiaId: number
   urlImagem?: string | null
 }): Promise<ForumPost> {
-  const response = await fetch(`${API_URL}/postagem`, {
+  const response = await fetch(`${API_URL}/postagens`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -107,7 +103,7 @@ export async function createPost(payload: {
 }
 
 export async function createComment(postId: string | number, payload: { conteudo: string; usuarioId: number }): Promise<ForumPost> {
-  const response = await fetch(`${API_URL}/postagem/${postId}/comentario`, {
+  const response = await fetch(`${API_URL}/postagens/${postId}/comentarios`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
