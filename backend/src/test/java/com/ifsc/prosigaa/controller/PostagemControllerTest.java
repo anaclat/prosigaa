@@ -5,6 +5,7 @@ import com.ifsc.prosigaa.dto.CadastroComentarioDTO;
 import com.ifsc.prosigaa.dto.CadastroPostagemDTO;
 import com.ifsc.prosigaa.dto.PostagemDTO;
 import com.ifsc.prosigaa.enums.TipoPostagem;
+import com.ifsc.prosigaa.exception.ResourceNotFoundException;
 import com.ifsc.prosigaa.model.Comentario;
 import com.ifsc.prosigaa.model.Postagem;
 import com.ifsc.prosigaa.service.ComentarioService;
@@ -22,8 +23,10 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,7 +49,7 @@ class PostagemControllerTest {
     void deveListarPostagens() throws Exception {
         when(postagemService.listar(null, null)).thenReturn(List.of());
 
-        mockMvc.perform(get("/postagem"))
+        mockMvc.perform(get("/postagens"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray());
     }
@@ -59,7 +62,7 @@ class PostagemControllerTest {
         when(postagemService.buscar(1L)).thenReturn(postagemMock);
         when(postagemService.toDTO(postagemMock)).thenReturn(dtoMock);
 
-        mockMvc.perform(get("/postagem/1"))
+        mockMvc.perform(get("/postagens/1"))
         .andExpect(status().isOk());
     }
 
@@ -70,7 +73,7 @@ class PostagemControllerTest {
 
         when(postagemService.cadastrar(any(CadastroPostagemDTO.class))).thenReturn(dtoRetornoMock);
 
-        mockMvc.perform(post("/postagem")
+        mockMvc.perform(post("/postagens")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isCreated());
@@ -87,9 +90,44 @@ class PostagemControllerTest {
         when(postagemService.buscar(1L)).thenReturn(postagemMock);
         when(postagemService.toDTO(postagemMock)).thenReturn(dtoRetornoMock);
 
-        mockMvc.perform(post("/postagem/1/comentario")
+        mockMvc.perform(post("/postagens/1/comentarios")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isCreated());
+    }
+
+    @Test
+    void deveRetornarNotFoundQuandoPostagemNaoExiste() throws Exception {
+        when(postagemService.buscar(999L))
+                .thenThrow(new ResourceNotFoundException("Postagem não encontrada."));
+
+        mockMvc.perform(get("/postagens/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.mensagem").value("Postagem não encontrada."));
+    }
+
+    @Test
+    void deveRetornarBadRequestQuandoCorpoDaPostagemForInvalido() throws Exception {
+        mockMvc.perform(post("/postagens")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Corpo da requisição inválido ou incompleto."));
+    }
+
+    @Test
+    void deveExcluirPostagemSemConteudoNaResposta() throws Exception {
+        mockMvc.perform(delete("/postagens/1"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void deveExcluirComentarioSemConteudoNaResposta() throws Exception {
+        mockMvc.perform(delete("/postagens/comentarios/2"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
     }
 }

@@ -38,7 +38,7 @@ class FaseControllerTest {
         FasesDTO dtoMock = new FasesDTO(List.of());
         when(faseService.listar()).thenReturn(dtoMock);
 
-        mockMvc.perform(get("/fase"))
+        mockMvc.perform(get("/fases"))
         .andExpect(status().isOk());
     }
 
@@ -53,7 +53,7 @@ class FaseControllerTest {
 
         when(faseService.cadastrar("Fase 1", 1)).thenReturn(faseMock);
 
-        mockMvc.perform(post("/fase")
+        mockMvc.perform(post("/fases")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isCreated())

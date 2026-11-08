@@ -20,7 +20,7 @@ class ApiIntegracaoTest {
 
     @Test
     void deveConsultarFasesPelaApiComAplicacaoIntegrada() throws Exception {
-        mockMvc.perform(get("/fase"))
+        mockMvc.perform(get("/fases"))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.fases").isArray())
@@ -32,14 +32,24 @@ class ApiIntegracaoTest {
 
     @Test
     void deveRetornarListaDePostagens() throws Exception {
-        mockMvc.perform(get("/postagem"))
+        mockMvc.perform(get("/postagens"))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$.length()").value(4));
 
-        mockMvc.perform(get("/postagem/1"))
+        mockMvc.perform(get("/postagens/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.comentarios.length()").value(3));
+    }
+
+    @Test
+    void devePublicarDocumentacaoOpenApiComRotasECodigosDeCriacao() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.paths['/usuarios'].post.responses['201'].description").value("Usuário criado"))
+                .andExpect(jsonPath("$.paths['/postagens'].post.responses['201'].description").value("Postagem criada"))
+                .andExpect(jsonPath("$.paths['/postagens/{id}'].delete.responses['204'].description").value("Postagem excluída"));
     }
 }

@@ -36,7 +36,7 @@ class MateriaControllerTest {
     void deveListarMateriasComParametroOpcional() throws Exception {
         when(materiaService.listar(1L)).thenReturn(List.of());
 
-        mockMvc.perform(get("/materia").param("faseId", "1"))
+        mockMvc.perform(get("/materias").param("faseId", "1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray());
     }
@@ -52,7 +52,7 @@ class MateriaControllerTest {
 
         when(materiaService.cadastrar("Matemática", "MAT101", 1L)).thenReturn(materiaMock);
 
-        mockMvc.perform(post("/materia")
+        mockMvc.perform(post("/materias")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isCreated())

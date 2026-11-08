@@ -35,7 +35,7 @@ class UsuarioControllerTest {
 
         when(usuarioService.login("teste@ifsc.edu.br", "123456")).thenReturn(usuarioMock);
 
-        mockMvc.perform(post("/usuario/login")
+        mockMvc.perform(post("/usuarios/sessao")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(loginDTO)))
         .andExpect(status().isOk())
@@ -49,10 +49,10 @@ class UsuarioControllerTest {
         when(usuarioService.login("invalido@ifsc.edu.br", "000"))
         .thenThrow(new IllegalArgumentException("Credenciais inválidas."));
 
-        mockMvc.perform(post("/usuario/login")
+        mockMvc.perform(post("/usuarios/sessao")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(loginDTO)))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.erro").value("Credenciais inválidas."));
+        .andExpect(jsonPath("$.mensagem").value("Credenciais inválidas."));
     }
 }
