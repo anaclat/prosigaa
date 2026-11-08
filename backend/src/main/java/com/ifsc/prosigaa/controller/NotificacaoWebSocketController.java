@@ -1,7 +1,10 @@
 package com.ifsc.prosigaa.controller;
 
+import com.ifsc.prosigaa.dto.ApiErrorDTO;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ public class NotificacaoWebSocketController {
     @PostMapping("/notify")
     @Operation(summary = "Enviar notificação de teste", description = "Publica uma notificação em tópico geral ou no tópico de um usuário.")
     @ApiResponse(responseCode = "200", description = "Notificação enviada")
+    @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public ResponseEntity<Map<String, Object>> enviarNotificacaoTeste(
             @RequestParam(required = false) Long userId,
             @RequestBody(required = false) Map<String, Object> payload) {

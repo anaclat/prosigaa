@@ -10,6 +10,19 @@ A especificação interativa está disponível em `/swagger-ui.html`; o document
 - Identificadores de ações de escrita são enviados no corpo JSON, nunca em query string.
 - `400`: entrada inválida/credenciais inválidas; `404`: recurso inexistente; `409`: conflito/integridade; `500`: erro inesperado.
 - Respostas de criação usam `201 Created`; exclusões definitivas usam `204 No Content`.
+- As exclusões de curtida retornam `200 OK` com uma mensagem; recebem `usuarioId` no corpo JSON.
+- Os erros seguem o mesmo formato JSON, com `status`, `erro`, `mensagem` e `timestamp`. Exemplo de `404`:
+
+```json
+{
+  "status": 404,
+  "erro": "Not Found",
+  "mensagem": "Postagem não encontrada.",
+  "timestamp": "2026-11-07T21:00:00"
+}
+```
+
+O Swagger documenta os códigos de sucesso e erro e associa as respostas de erro ao schema `ApiErrorDTO`.
 
 ## Endpoints
 

@@ -50,6 +50,9 @@ class ApiIntegracaoTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.paths['/usuarios'].post.responses['201'].description").value("Usuário criado"))
                 .andExpect(jsonPath("$.paths['/postagens'].post.responses['201'].description").value("Postagem criada"))
-                .andExpect(jsonPath("$.paths['/postagens/{id}'].delete.responses['204'].description").value("Postagem excluída"));
+                .andExpect(jsonPath("$.paths['/postagens/{id}'].delete.responses['204'].description").value("Postagem excluída"))
+                .andExpect(jsonPath("$.paths['/postagens/{id}'].get.responses['404'].description").value("Postagem não encontrada"))
+                .andExpect(jsonPath("$.paths['/curtidas/postagens/{postagemId}'].delete.responses['200'].description").value("Curtida removida"))
+                .andExpect(jsonPath("$.components.schemas.ApiErrorDTO.properties.mensagem.example").value("Postagem não encontrada."));
     }
 }
