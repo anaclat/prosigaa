@@ -1,19 +1,18 @@
 # Declaração de uso de inteligência artificial — ProSIGAA
 
-## Ferramenta utilizada nesta revisão
+## Ferramentas e participação
 
-- **Ferramenta:** ChatGPT, modelo GPT-6 (OpenAI).
-- **Finalidade:** apoio à análise do feedback de avaliação, revisão da documentação técnica, sugestão/implementação de ajustes no código Java/Spring Boot e preparação de exemplos de API e diagramas.
-- **Responsabilidade:** a ferramenta foi utilizada como assistente. A equipe continua responsável por compreender, revisar, testar e validar todo o conteúdo antes da entrega.
+Usamos **Copilot**, **Gemini** e **ChatGPT** como ferramentas de apoio em diferentes etapas do projeto. Não mantivemos um registro completo que associe cada ferramenta a um modelo ou versão específica, a cada prompt e a cada linha de código. Por isso, descrevemos abaixo as contribuições que conseguimos identificar, sem atribuir autoria de trechos específicos quando não temos essa informação.
 
-## Solicitações fornecidas nesta revisão
+Também usamos o assistente integrado ao Copilot SDK no VS Code nesta interação para analisar o feedback, sugerir e implementar alterações e revisar a documentação. A equipe continua responsável por compreender, revisar, testar e validar o código e a documentação antes da entrega.
 
-As instruções efetivamente fornecidas pelo usuário nesta conversa foram, em síntese:
+## Solicitações e objetivos
 
-1. “Dado o seguinte projeto em arquivo zip e o feedback do professor, forneça a lista de correções necessárias.”
-2. Foi fornecido o feedback completo do professor apontando problemas em análise/modelagem, OpenAPI, códigos HTTP, rotas REST, operações de exclusão, consultas N+1, armazenamento de senhas e declaração de uso de IA.
+No trabalho anterior, fornecemos o feedback do professor sobre análise e modelagem, OpenAPI, códigos HTTP, rotas REST, operações de exclusão, consultas N+1, armazenamento de senhas e declaração de uso de IA. Também solicitamos uma lista de correções necessárias.
 
-A partir dessas solicitações, o trabalho foi direcionado para revisar os arquivos existentes, alinhar os casos de uso aos endpoints, substituir o diagrama de fluxo por notação UML de casos de uso, documentar operações REST e corrigir os pontos técnicos indicados.
+Nesta interação, pedimos ajuda para organizar as correções em etapas e commits separados, escrever as mensagens de commit em português, deixar a revisão de senhas para o final, acrescentar enums ao diagrama de classes e continuar o cronograma. Também pedimos que a declaração de IA preservasse as informações anteriores e fosse escrita como uma fala da equipe.
+
+Não registramos os prompts exatos usados em todas as etapas anteriores. Quando não temos o texto literal, descrevemos o objetivo da solicitação em vez de apresentá-lo como citação.
 
 ## Arquivos do projeto examinados ou alterados com assistência de IA
 
@@ -29,20 +28,33 @@ A partir dessas solicitações, o trabalho foi direcionado para revisar os arqui
 - `src/main/resources/application.properties` — configuração de busca em lote.
 - `docs/CASOS_DE_USO.md`, `docs/ARQUITETURA_E_MODELO.md` e `docs/API_REST.md` — revisão da documentação funcional, estrutural e do contrato HTTP.
 - `docs/USO_DE_IA.md` — esta declaração.
+- `ProSigaa/src/pages/AuthPage.tsx`, `ProSigaa/src/services/forumService.ts` e `ProSigaa/src/services/likeService.ts` — alinhamento do frontend às rotas REST plurais e envio de `usuarioId` no corpo das requisições de curtida.
+- `backend/src/main/java/com/ifsc/prosigaa/controller/` — documentação OpenAPI das respostas de sucesso e erro.
+- `backend/src/main/java/com/ifsc/prosigaa/dto/ApiErrorDTO.java` e DTOs de cadastro — schema de erro comum e exemplos de campos para o OpenAPI.
+- `backend/src/test/java/com/ifsc/prosigaa/controller/` e `backend/src/test/java/com/ifsc/prosigaa/integration/ApiIntegracaoTest.java` — testes de rotas canônicas, status HTTP, erros, exclusões e documentação OpenAPI.
+- `backend/docs/CASOS_DE_USO.md` e `backend/docs/ARQUITETURA_E_MODELO.md` — detalhamento de casos de uso e revisão dos diagramas, incluindo enums.
+
+No commit `b524328`, usamos IA como apoio para adicionar tratamento de exceções, implementar hash de senhas, atualizar o README e adicionar testes. O commit contém mudanças relacionadas a esses tópicos, mas não identifica quais trechos foram produzidos com IA. Não temos registrados a ferramenta específica, o modelo, os prompts ou a lista exata de arquivos dessa contribuição.
 
 ## Exemplos de contribuição da IA
 
-- Sugeriu a utilização de `BCryptPasswordEncoder` em vez de comparação/armazenamento de senha em texto puro.
-- Sugeriu diferenciar `400 Bad Request`, `404 Not Found`, `409 Conflict` e `500 Internal Server Error` no tratamento centralizado.
-- Sugeriu rotas de recursos no plural, envio de `usuarioId` no corpo JSON das operações de curtida e uso de `201 Created` em criações.
-- Apoiou a redação dos fluxos alternativos dos casos de uso e a elaboração dos diagramas em PlantUML/Mermaid.
-- Sugeriu `@BatchSize` e `hibernate.default_batch_fetch_size` para reduzir consultas N+1 nas associações acessadas ao montar os DTOs.
+- Usamos sugestões de IA para configurar `BCryptPasswordEncoder` em vez de comparar ou armazenar senhas em texto puro.
+- Com apoio de IA, diferenciamos respostas `400 Bad Request`, `404 Not Found`, `409 Conflict` e `500 Internal Server Error` no tratamento centralizado.
+- Com apoio de IA, revisamos as rotas de recursos para usar plural, enviamos `usuarioId` no corpo JSON das operações de curtida e usamos `201 Created` nas criações.
+- Usamos IA como apoio para redigir fluxos alternativos dos casos de uso e elaborar diagramas em PlantUML/Mermaid.
+- Com apoio de IA, configuramos `@BatchSize` e `hibernate.default_batch_fetch_size` para reduzir consultas N+1 ao montar DTOs.
+- Nesta interação, alinhamos as chamadas do frontend às rotas plurais da API e ao envio de dados de curtida no corpo JSON.
+- Documentamos respostas de erro no OpenAPI usando um DTO comum e ampliamos os testes do contrato documentado com apoio de IA.
+- Expandimos os casos de uso, revisamos diagramas UML e acrescentamos ao diagrama de classes os enums existentes, com apoio de IA.
+- Criamos, com apoio de IA, uma verificação de integração para medir as consultas do endpoint de listagem de postagens com associações carregadas em lote.
 
 ## Exemplos de criação humana
 
-- Toda a estrutura inicial (como o projeto iria ser organizado) foi feito a mão
-- A IA ajudou a criar o que faltava com base nos controllers/services/repositories/models já criados
+- Criamos manualmente a estrutura inicial e organizamos o projeto.
+- Também usamos IA para ajudar a completar partes com base nos controllers, services, repositories e models que já existiam.
 
 ## Validação humana
 
-Foram testados manualmente os endpoints alterados por IA.
+Testamos manualmente endpoints alterados com apoio de IA em etapas anteriores. Nesta interação, executamos o build do frontend e a suíte backend: 26 testes passaram, sem falhas. Não concluímos o lint do frontend porque o projeto não possui um arquivo de configuração `eslint.config.*` compatível com ESLint 9.
+
+Como equipe, somos responsáveis por revisar e validar as contribuições antes da entrega. Devemos complementar esta declaração se recuperarmos informações mais precisas sobre ferramentas, modelos, prompts e arquivos das etapas anteriores.
