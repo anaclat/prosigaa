@@ -256,4 +256,4 @@ sequenceDiagram
 
 ## Carregamento de associações
 
-As associações percorridas ao montar DTOs possuem `@BatchSize(size = 50)` e a aplicação configura `hibernate.default_batch_fetch_size=50`. O teste de integração `ConsultaPostagensBatchTest` cria 60 postagens adicionais com comentários e curtidas e verifica que o `GET /postagens` executa menos de 40 consultas SQL. Isso valida o carregamento em lote para este caminho e cenário; não garante que outros endpoints ou volumes além do lote estejam livres de N+1.
+As associações percorridas ao montar DTOs possuem `@BatchSize(size = 50)` e a aplicação configura `hibernate.default_batch_fetch_size=50`. Essa configuração permite que o Hibernate carregue associações lazy em lotes. A redução efetiva de consultas deve ser verificada por teste de integração com estatísticas SQL; a anotação, isoladamente, não prova que todo caminho de leitura esteja livre de N+1.
