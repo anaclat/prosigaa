@@ -119,14 +119,14 @@ class PostagemControllerTest {
 
     @Test
     void deveExcluirPostagemSemConteudoNaResposta() throws Exception {
-        mockMvc.perform(delete("/postagens/1"))
+        mockMvc.perform(delete("/postagens/1?usuarioId=1"))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
     }
 
     @Test
     void deveExcluirComentarioSemConteudoNaResposta() throws Exception {
-        mockMvc.perform(delete("/postagens/comentarios/2"))
+        mockMvc.perform(delete("/postagens/comentarios/2?usuarioId=1"))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
     }

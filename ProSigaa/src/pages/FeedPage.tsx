@@ -92,7 +92,11 @@ export function FeedPage() {
     const post = posts.find((item) => item.id === postId)
     if (!post) return
 
-    await deletePost(postId)
+    if (!Number.isSafeInteger(currentUserId) || currentUserId <= 0) {
+      throw new Error('Sua sessão expirou. Entre novamente para excluir a postagem.')
+    }
+
+    await deletePost(postId, currentUserId)
     forgetLike(currentUserId, 'postagem', postId)
     post.comments.forEach((comment) => forgetLike(currentUserId, 'comentario', comment.id))
     setPosts((current) => current.filter((item) => item.id !== postId))
@@ -100,7 +104,11 @@ export function FeedPage() {
   }
 
   const handleDeleteComment = async (commentId: string) => {
-    await deleteComment(commentId)
+    if (!Number.isSafeInteger(currentUserId) || currentUserId <= 0) {
+      throw new Error('Sua sessão expirou. Entre novamente para excluir o comentário.')
+    }
+
+    await deleteComment(commentId, currentUserId)
     forgetLike(currentUserId, 'comentario', commentId)
     setPosts((current) => current.map((post) => ({
       ...post,

@@ -10,6 +10,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
     category,
     description: post.conteudo,
     author: post.usuario?.nome || 'Aluno',
+    authorId: post.usuario?.id ? Number(post.usuario.id) : undefined,
     time: new Date(post.criadoEm).toLocaleString('pt-BR', {
       day: '2-digit',
       month: 'short',
@@ -21,6 +22,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
     comments: (post.comentarios || []).map((comment) => ({
       id: String(comment.id),
       author: comment.usuario?.nome || 'Usuário',
+      authorId: comment.usuario?.id ? Number(comment.usuario.id) : undefined,
       message: comment.conteudo,
       time: new Date(comment.criadoEm).toLocaleString('pt-BR', {
         day: '2-digit',
@@ -118,16 +120,20 @@ export async function createComment(postId: string | number, payload: { conteudo
   return normalizePost(data)
 }
 
-export async function deletePost(postId: string): Promise<void> {
-  const response = await fetch(`${API_URL}/postagens/${postId}`, { method: 'DELETE' })
+export async function deletePost(postId: string, userId: number): Promise<void> {
+  const response = await fetch(`${API_URL}/postagens/${postId}?usuarioId=${encodeURIComponent(String(userId))}`, { method: 'DELETE' })
   if (!response.ok) {
     throw new Error((await response.text()) || 'Não foi possível excluir a postagem.')
   }
 }
 
-export async function deleteComment(commentId: string): Promise<void> {
-  const response = await fetch(`${API_URL}/postagens/comentarios/${commentId}`, { method: 'DELETE' })
+export async function deleteComment(commentId: string, userId: number): Promise<void> {
+  const response = await fetch(`${API_URL}/postagens/comentarios/${commentId}?usuarioId=${encodeURIComponent(String(userId))}`, {
+    method: 'DELETE',
+  })
+
   if (!response.ok) {
-    throw new Error((await response.text()) || 'Não foi possível excluir o comentário.')
+    const text = await response.text()
+    throw new Error(text || 'Não foi possível excluir o comentário.')
   }
 }

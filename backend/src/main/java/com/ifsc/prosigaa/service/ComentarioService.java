@@ -47,9 +47,18 @@ public class ComentarioService {
         return comentario;
     }
 
-    public void excluir(Long comentarioId) {
+    public void excluir(Long comentarioId, Long usuarioId) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("Informe o usuário que está excluindo o comentário.");
+        }
+
         Comentario comentario = comentarioRepository.findById(comentarioId)
                 .orElseThrow(() -> new com.ifsc.prosigaa.exception.ResourceNotFoundException("Comentário não encontrado."));
+
+        if (!comentario.getUsuario().getId().equals(usuarioId)) {
+            throw new IllegalArgumentException("Você só pode excluir seus próprios comentários.");
+        }
+
         comentarioRepository.delete(comentario);
     }
 

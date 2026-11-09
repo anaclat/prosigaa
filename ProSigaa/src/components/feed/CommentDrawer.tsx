@@ -3,13 +3,14 @@ import type { ForumPost } from '../../interfaces/forum'
 
 interface CommentDrawerProps {
   post: ForumPost
+  currentUserId: number
   onClose: () => void
   onSubmitComment: (postId: string, content: string) => Promise<void>
   onLikeComment: (commentId: string) => Promise<void>
   onDeleteComment: (commentId: string) => Promise<void>
 }
 
-export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment, onDeleteComment }: CommentDrawerProps) {
+export function CommentDrawer({ post, currentUserId, onClose, onSubmitComment, onLikeComment, onDeleteComment }: CommentDrawerProps) {
   const [draft, setDraft] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -116,58 +117,64 @@ export function CommentDrawer({ post, onClose, onSubmitComment, onLikeComment, o
             {post.comments.length === 0 ? (
               <p className="no-comments">Ainda não há comentários. Comece a conversa.</p>
             ) : (
-              post.comments.map((comment) => (
-                <article className="drawer-comment" key={comment.id}>
-                  <div className="expanded-comment-heading">
-                    <strong>{comment.author}</strong>
-                    {comment.isProfessor && (
-                      <span className="professor-guarantee">Garantido pelo Professor</span>
-                    )}
-                    <time>{comment.time}</time>
-                    <div className="overflow-menu">
-                      <button
-                        type="button"
-                        className="overflow-menu-trigger"
-                        aria-label={`Mais opções para o comentário de ${comment.author}`}
-                        aria-haspopup="menu"
-                        aria-expanded={openMenuCommentId === comment.id}
-                        onClick={() => setOpenMenuCommentId((current) => current === comment.id ? null : comment.id)}
-                      >
-                        <span aria-hidden="true">⋯</span>
-                      </button>
-                      {openMenuCommentId === comment.id && (
-                        <div className="overflow-menu-items" role="menu">
+              post.comments.map((comment) => {
+                const isCommentOwner = Number(comment.authorId) === currentUserId
+
+                return (
+                  <article className="drawer-comment" key={comment.id}>
+                    <div className="expanded-comment-heading">
+                      <strong>{comment.author}</strong>
+                      {comment.isProfessor && (
+                        <span className="professor-guarantee">Garantido pelo Professor</span>
+                      )}
+                      <time>{comment.time}</time>
+                      {isCommentOwner && (
+                        <div className="overflow-menu">
                           <button
                             type="button"
-                            role="menuitem"
-                            className="overflow-menu-delete"
-                            onClick={() => void handleDeleteComment(comment.id)}
-                            disabled={deletingCommentIds.includes(comment.id)}
+                            className="overflow-menu-trigger"
+                            aria-label={`Mais opções para o comentário de ${comment.author}`}
+                            aria-haspopup="menu"
+                            aria-expanded={openMenuCommentId === comment.id}
+                            onClick={() => setOpenMenuCommentId((current) => current === comment.id ? null : comment.id)}
                           >
-                            {deletingCommentIds.includes(comment.id) ? 'Excluindo...' : 'Excluir comentário'}
+                            <span aria-hidden="true">⋯</span>
                           </button>
+                          {openMenuCommentId === comment.id && (
+                            <div className="overflow-menu-items" role="menu">
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="overflow-menu-delete"
+                                onClick={() => void handleDeleteComment(comment.id)}
+                                disabled={deletingCommentIds.includes(comment.id)}
+                              >
+                                {deletingCommentIds.includes(comment.id) ? 'Excluindo...' : 'Excluir comentário'}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  </div>
-                  <p>{comment.message}</p>
-                  <div className="drawer-comment-actions">
-                    <button
-                      type="button"
-                      className={`inline-action like-action comment-like-action ${comment.liked ? 'active' : ''}`}
-                      onClick={() => void handleLikeComment(comment.id)}
-                      disabled={likingCommentIds.includes(comment.id)}
-                      aria-pressed={Boolean(comment.liked)}
-                      aria-label={`${comment.liked ? 'Descurtir' : 'Curtir'} comentário, ${comment.likes ?? 0} curtidas`}
-                    >
-                      <svg aria-hidden="true" viewBox="0 0 24 24">
-                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
-                      </svg>
-                      {comment.likes ?? 0}
-                    </button>
-                  </div>
-                </article>
-              ))
+                    <p>{comment.message}</p>
+                    <div className="drawer-comment-actions">
+                      <button
+                        type="button"
+                        className={`inline-action like-action comment-like-action ${comment.liked ? 'active' : ''}`}
+                        onClick={() => void handleLikeComment(comment.id)}
+                        disabled={likingCommentIds.includes(comment.id)}
+                        aria-pressed={Boolean(comment.liked)}
+                        aria-label={`${comment.liked ? 'Descurtir' : 'Curtir'} comentário, ${comment.likes ?? 0} curtidas`}
+                      >
+                        <svg aria-hidden="true" viewBox="0 0 24 24">
+                          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                        </svg>
+                        {comment.likes ?? 0}
+                      </button>
+                    </div>
+                  </article>
+                )
+              })
             )}
           </section>
         </div>

@@ -5,6 +5,7 @@ export type PostType = 'DUVIDA' | 'MATERIAL_ESTUDO'
 export interface Comment {
   id: string
   author: string
+  authorId?: number
   message: string
   time: string
   isProfessor?: boolean
@@ -32,6 +33,7 @@ export interface ForumPost {
   category: PostType
   description: string
   author: string
+  authorId?: number
   time: string
   categoryLabel: string
   likesCount: number

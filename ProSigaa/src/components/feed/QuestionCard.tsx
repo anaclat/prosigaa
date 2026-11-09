@@ -3,12 +3,13 @@ import type { ForumPost } from '../../interfaces/forum'
 
 interface QuestionCardProps {
   post: ForumPost
+  currentUserId: number
   onOpenComments: (postId: string) => void
   onLike: (postId: string) => Promise<void>
   onDelete: (postId: string) => Promise<void>
 }
 
-export function QuestionCard({ post, onOpenComments, onLike, onDelete }: QuestionCardProps) {
+export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDelete }: QuestionCardProps) {
   const [isLiking, setIsLiking] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -43,35 +44,39 @@ export function QuestionCard({ post, onOpenComments, onLike, onDelete }: Questio
     }
   }
 
+  const isPostOwner = Number(post.authorId) === currentUserId
+
   return (
     <article className="question-card">
       <div className="card-topline">
         <span className="card-label">{post.categoryLabel}</span>
-        <div className="overflow-menu">
-          <button
-            type="button"
-            className="overflow-menu-trigger"
-            aria-label={`Mais opções para a postagem ${post.title}`}
-            aria-haspopup="menu"
-            aria-expanded={isMenuOpen}
-            onClick={() => setIsMenuOpen((open) => !open)}
-          >
-            <span aria-hidden="true">⋯</span>
-          </button>
-          {isMenuOpen && (
-            <div className="overflow-menu-items" role="menu">
-              <button
-                type="button"
-                role="menuitem"
-                className="overflow-menu-delete"
-                onClick={() => void handleDelete()}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Excluindo...' : 'Excluir postagem'}
-              </button>
-            </div>
-          )}
-        </div>
+        {isPostOwner && (
+          <div className="overflow-menu">
+            <button
+              type="button"
+              className="overflow-menu-trigger"
+              aria-label={`Mais opções para a postagem ${post.title}`}
+              aria-haspopup="menu"
+              aria-expanded={isMenuOpen}
+              onClick={() => setIsMenuOpen((open) => !open)}
+            >
+              <span aria-hidden="true">⋯</span>
+            </button>
+            {isMenuOpen && (
+              <div className="overflow-menu-items" role="menu">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="overflow-menu-delete"
+                  onClick={() => void handleDelete()}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Excluindo...' : 'Excluir postagem'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="question-title-link">

@@ -99,8 +99,17 @@ public class PostagemService {
         }
     }
 
-    public void excluir(Long id) {
+    public void excluir(Long id, Long usuarioId) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("Informe o usuário que está excluindo a postagem.");
+        }
+
         Postagem postagem = buscar(id);
+
+        if (!postagem.getUsuario().getId().equals(usuarioId)) {
+            throw new IllegalArgumentException("Você só pode excluir suas próprias postagens.");
+        }
+
         postagemRepository.delete(postagem);
     }
 

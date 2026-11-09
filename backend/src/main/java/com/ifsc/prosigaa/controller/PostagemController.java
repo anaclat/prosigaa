@@ -74,8 +74,8 @@ public class PostagemController {
     @ApiResponse(responseCode = "400", description = "Identificador inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     @ApiResponse(responseCode = "404", description = "Postagem não encontrada", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
-    public void excluir(@PathVariable Long id) {
-        postagemService.excluir(id);
+    public void excluir(@PathVariable Long id, @RequestParam Long usuarioId) {
+        postagemService.excluir(id, usuarioId);
     }
 
     @DeleteMapping("/comentarios/{comentarioId}")
@@ -85,7 +85,7 @@ public class PostagemController {
     @ApiResponse(responseCode = "400", description = "Identificador inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     @ApiResponse(responseCode = "404", description = "Comentário não encontrado", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
-    public void excluirComentario(@PathVariable Long comentarioId) {
-        comentarioService.excluir(comentarioId);
+    public void excluirComentario(@PathVariable Long comentarioId, @RequestParam Long usuarioId) {
+        comentarioService.excluir(comentarioId, usuarioId);
     }
 }
