@@ -242,6 +242,7 @@ export function FeedPage() {
                 <QuestionCard
                   key={post.id}
                   post={post}
+                  currentUserId={currentUserId}
                   onOpenComments={setSelectedPostId}
                   onLike={handleLikePost}
                   onDelete={handleDeletePost}
@@ -255,6 +256,7 @@ export function FeedPage() {
       {selectedPost && (
         <CommentDrawer
           post={selectedPost}
+          currentUserId={currentUserId}
           onClose={closeComments}
           onSubmitComment={handleCommentSubmit}
           onLikeComment={handleLikeComment}
