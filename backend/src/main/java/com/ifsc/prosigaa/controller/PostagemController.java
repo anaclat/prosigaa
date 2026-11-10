@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping({"/postagens", "/postagem"})
+@RequestMapping("/postagens")
 @Tag(name = "Postagens", description = "Publicações e comentários acadêmicos")
 public class PostagemController {
     private final PostagemService postagemService;

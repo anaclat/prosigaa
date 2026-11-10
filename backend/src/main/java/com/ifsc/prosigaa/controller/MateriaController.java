@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/materias", "/materia"})
+@RequestMapping("/materias")
 @Tag(name = "Matérias")
 public class MateriaController {
     private final MateriaService service;

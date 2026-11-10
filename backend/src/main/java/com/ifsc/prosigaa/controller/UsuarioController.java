@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/usuarios", "/usuario"})
+@RequestMapping("/usuarios")
 @Tag(name = "Usuários", description = "Cadastro e autenticação de usuários")
 public class UsuarioController {
     private final UsuarioService usuarioService;
@@ -30,7 +30,7 @@ public class UsuarioController {
         return usuarioService.listar();
     }
 
-    @PostMapping({"", "/cadastro"})
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cadastrar usuário", description = "Cria uma conta e armazena a senha com BCrypt.")
     @ApiResponse(responseCode = "201", description = "Usuário criado")
@@ -41,7 +41,7 @@ public class UsuarioController {
         return usuarioService.cadastrar(dto.nome(), dto.email(), dto.senha(), dto.tipo());
     }
 
-    @PostMapping({"/sessao", "/login"})
+    @PostMapping("/login")
     @Operation(summary = "Autenticar usuário", description = "Valida e-mail e senha e retorna dados públicos.")
     @ApiResponse(responseCode = "200", description = "Autenticação realizada")
     @ApiResponse(responseCode = "400", description = "Credenciais inválidas", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))

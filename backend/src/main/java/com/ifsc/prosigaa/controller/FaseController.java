@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/fases", "/fase"})
+@RequestMapping("/fases")
 @Tag(name = "Fases")
 public class FaseController {
     private final FaseService service;
