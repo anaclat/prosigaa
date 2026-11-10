@@ -116,6 +116,27 @@ cd backend
 gradlew.bat bootRun
 ```
 
+## Teste E2E da API
+
+Com o backend em execução e apontando para o banco que deseja inspecionar, execute:
+
+```powershell
+cd ProSigaa
+npm.cmd install
+npm.cmd run test:e2e
+```
+
+Por padrão, a suíte chama `http://localhost:8080`. Para usar outra URL (por exemplo,
+o proxy do Docker), defina `API_BASE_URL` antes de executar:
+
+```powershell
+$env:API_BASE_URL = "http://localhost:3000/api"
+npm.cmd run test:e2e
+```
+
+O teste não apaga registros. Reutiliza a fase, a matéria e o usuário fixos quando já
+existem; cada execução cria uma nova postagem, comentário e curtida persistentes.
+
 ## Docker (um container para tudo)
 
 Para facilitar deploy no Coolify, o projeto possui um único `Dockerfile` na raiz que sobe:
