@@ -19,11 +19,15 @@ import java.util.Map;
 @RequestMapping("/api/test")
 @Tag(name = "Notificações", description = "Envio de notificações de teste por WebSocket")
 @RequiredArgsConstructor
+// Esta rota é REST (requisição-resposta) que publica um evento no broker WebSocket/STOMP;
+// o cliente inscrito no tópico recebe a notificação sem polling.
 public class NotificacaoWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/notify")
+    // POST solicita o envio do evento e retorna 200 quando foi publicado; o recebimento
+    // pelos clientes acontece assincronamente pela conexão WebSocket, não nesta resposta HTTP.
     @Operation(summary = "Enviar notificação de teste", description = "Publica uma notificação em tópico geral ou no tópico de um usuário.")
     @ApiResponse(responseCode = "200", description = "Notificação enviada")
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))

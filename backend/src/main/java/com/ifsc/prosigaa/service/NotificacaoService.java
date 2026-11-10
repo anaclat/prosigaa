@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+// Serviço publica eventos de domínio no STOMP; o fluxo é assíncrono e desacoplado da resposta REST.
 public class NotificacaoService {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -19,6 +20,7 @@ public class NotificacaoService {
             return;
         }
 
+        // O destino permite ao cliente assinar notificações do usuário; ele não é uma rota REST.
         messagingTemplate.convertAndSend(
                 "/topic/usuarios/" + usuarioId + "/notifications",
                 notification

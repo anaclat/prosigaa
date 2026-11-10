@@ -11,11 +11,17 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSocketMessageBroker
+// REST usa requisição-resposta; WebSocket mantém conexão persistente para tráfego full-duplex.
+// Diferente de SSE (unidirecional servidor -> cliente), WebSocket permite envio nos dois sentidos;
+// polling simula atualizações repetindo requisições e tende a gerar mais tráfego.
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Value("${app.cors.allowed-origin-patterns:*}")
     private String allowedOriginPatterns;
 
+    // STOMP organiza mensagens em destinos: /app recebe ações da aplicação e /topic ou /queue
+    // são destinos distribuídos pelo broker aos clientes inscritos.
+    
     /**
      * Configura o broker de mensagens.
      */
@@ -43,6 +49,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     }
 
+    // /ws inicia a conexão STOMP; SockJS pode oferecer transportes alternativos quando
+    // WebSocket direto não estiver disponível. CORS/origens continuam sendo uma decisão de segurança.
+    
     /**
      * Endpoint que o frontend utiliza para estabelecer
      * a conexão WebSocket/STOMP.

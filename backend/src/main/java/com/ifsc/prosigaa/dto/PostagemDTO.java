@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "Representação de postagem com autor, classificação, comentários e contagem de curtidas.")
+// Representação JSON própria da API, separada da entidade JPA. Não contém links de navegação.
+// NOTA DE PROVA: para Richardson nível 3 (HATEOAS), incluir links como _links.self e _links.curtir.
 public record PostagemDTO(
         Long id,
         String titulo,

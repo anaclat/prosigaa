@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/materias")
 @Tag(name = "Matérias")
+// O caminho nomeia a coleção de matérias; o ID da fase é um filtro/contexto da relação.
 public class MateriaController {
     private final MateriaService service;
 
@@ -24,6 +25,8 @@ public class MateriaController {
     }
 
     @GetMapping
+    // GET é seguro e idempotente; faseId apenas filtra a representação retornada.
+    // Cada chamada carrega seus parâmetros, sem depender de sessão HTTP no servidor.
     @Operation(summary = "Listar matérias", description = "Pode receber faseId para filtrar por fase.")
     @ApiResponse(responseCode = "200", description = "Lista de matérias")
     @ApiResponse(responseCode = "400", description = "Identificador de fase inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
@@ -34,6 +37,8 @@ public class MateriaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    // POST cria uma matéria associada à fase informada no corpo; repetição pode duplicar o recurso.
+    // 201 indica criação; 404 é usado pelo handler global se a fase referenciada não existir.
     @Operation(summary = "Cadastrar matéria", description = "Cria uma matéria associada a uma fase existente.")
     @ApiResponse(responseCode = "201", description = "Matéria criada")
     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))

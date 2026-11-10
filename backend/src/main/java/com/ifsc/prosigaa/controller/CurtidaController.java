@@ -17,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/curtidas")
 @Tag(name = "Curtidas")
+// Curtidas modelam relações entre usuários e conteúdo; estas rotas oferecem criar/remover.
 public class CurtidaController {
     private final CurtidaService service;
 
@@ -26,6 +27,8 @@ public class CurtidaController {
 
     @PostMapping("/postagens/{postagemId}")
     @ResponseStatus(HttpStatus.CREATED)
+    // POST registra a relação de curtida. Repetir POST não é garantido idempotente pelo HTTP;
+    // a regra de duplicidade, se necessária, pertence ao serviço/domínio. 201 confirma criação.
     @Operation(summary = "Curtir postagem", description = "O usuário autor da ação é informado no corpo JSON.")
     @ApiResponse(responseCode = "201", description = "Curtida registrada")
     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
@@ -40,6 +43,7 @@ public class CurtidaController {
 
     @PostMapping("/comentarios/{comentarioId}")
     @ResponseStatus(HttpStatus.CREATED)
+    // Mesmo padrão para curtida de comentário: POST cria uma relação e pode alterar o estado.
     @Operation(summary = "Curtir comentário", description = "Registra uma curtida do usuário indicado no corpo JSON.")
     @ApiResponse(responseCode = "201", description = "Curtida registrada")
     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
@@ -53,6 +57,8 @@ public class CurtidaController {
     }
 
     @DeleteMapping("/postagens/{postagemId}")
+    // DELETE remove a relação de curtida; repetir tende ao mesmo estado final (sem curtida).
+    // Este contrato responde 200 com uma mensagem; DELETE também poderia usar 204 sem corpo.
     @Operation(summary = "Remover curtida de postagem", description = "Remove a curtida do usuário indicado no corpo JSON.")
     @ApiResponse(responseCode = "200", description = "Curtida removida")
     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
@@ -66,6 +72,7 @@ public class CurtidaController {
     }
 
     @DeleteMapping("/comentarios/{comentarioId}")
+    // Remoção de curtida do comentário: DELETE é idempotente quanto ao estado final.
     @Operation(summary = "Remover curtida de comentário", description = "Remove a curtida do usuário indicado no corpo JSON.")
     @ApiResponse(responseCode = "200", description = "Curtida removida")
     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
@@ -79,6 +86,7 @@ public class CurtidaController {
     }
 
     @DeleteMapping("/postagens/{postagemId}/usuarios/{usuarioId}")
+    // Variante que transporta os dois identificadores na rota; também usa DELETE para remoção.
     @Operation(summary = "Remover curtida de postagem", description = "Remove a curtida identificada pela postagem e pelo usuário na rota.")
     @ApiResponse(responseCode = "200", description = "Curtida removida")
     @ApiResponse(responseCode = "400", description = "Identificador inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
@@ -95,6 +103,7 @@ public class CurtidaController {
     }
 
     @DeleteMapping("/comentarios/{comentarioId}/usuarios/{usuarioId}")
+    // Outra representação da mesma remoção; manter rotas equivalentes aumenta a superfície da API.
     @Operation(summary = "Remover curtida de comentário", description = "Remove a curtida identificada pelo comentário e pelo usuário na rota.")
     @ApiResponse(responseCode = "200", description = "Curtida removida")
     @ApiResponse(responseCode = "400", description = "Identificador inválido", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
