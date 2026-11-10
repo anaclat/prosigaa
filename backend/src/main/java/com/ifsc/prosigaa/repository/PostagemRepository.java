@@ -9,15 +9,15 @@ import java.util.List;
 public interface PostagemRepository extends JpaRepository<Postagem, Long> {
     boolean existsByFaseIdAndMateriaId(Long faseId, Long materiaId);
 
-    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario", "comentarios.curtidas", "curtidas"})
+    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario"})
     List<Postagem> findByFaseIdAndMateriaIdOrderByCriadoEmDesc(Long faseId, Long materiaId);
 
-    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario", "comentarios.curtidas", "curtidas"})
+    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario"})
     List<Postagem> findByFaseIdOrderByCriadoEmDesc(Long faseId);
 
-    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario", "comentarios.curtidas", "curtidas"})
+    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario"})
     List<Postagem> findByMateriaIdOrderByCriadoEmDesc(Long materiaId);
 
-    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario", "comentarios.curtidas", "curtidas"})
+    @EntityGraph(attributePaths = {"usuario", "fase", "materia", "comentarios", "comentarios.usuario"})
     List<Postagem> findAllByOrderByCriadoEmDesc();
 }

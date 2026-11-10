@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -32,7 +33,9 @@ public class CurtidaController {
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public Map<String, String> curtirPostagem(@PathVariable Long postagemId, @RequestBody CurtidaDTO dto) {
         service.curtirPostagem(postagemId, dto.usuarioId());
-        return Map.of("mensagem", "Postagem curtida.");
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Postagem curtida.");
+        return resposta;
     }
 
     @PostMapping("/comentarios/{comentarioId}")
@@ -44,7 +47,9 @@ public class CurtidaController {
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public Map<String, String> curtirComentario(@PathVariable Long comentarioId, @RequestBody CurtidaDTO dto) {
         service.curtirComentario(comentarioId, dto.usuarioId());
-        return Map.of("mensagem", "Comentário curtido.");
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Comentário curtido.");
+        return resposta;
     }
 
     @DeleteMapping("/postagens/{postagemId}")
@@ -55,7 +60,9 @@ public class CurtidaController {
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public Map<String, String> descurtirPostagem(@PathVariable Long postagemId, @RequestBody CurtidaDTO dto) {
         service.descurtirPostagem(postagemId, dto.usuarioId());
-        return Map.of("mensagem", "Curtida removida.");
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Curtida removida.");
+        return resposta;
     }
 
     @DeleteMapping("/comentarios/{comentarioId}")
@@ -66,7 +73,9 @@ public class CurtidaController {
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public Map<String, String> descurtirComentario(@PathVariable Long comentarioId, @RequestBody CurtidaDTO dto) {
         service.descurtirComentario(comentarioId, dto.usuarioId());
-        return Map.of("mensagem", "Curtida removida.");
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Curtida removida.");
+        return resposta;
     }
 
     @DeleteMapping("/postagens/{postagemId}/usuarios/{usuarioId}")
@@ -80,7 +89,9 @@ public class CurtidaController {
             @PathVariable Long usuarioId
     ) {
         service.descurtirPostagem(postagemId, usuarioId);
-        return Map.of("mensagem", "Curtida removida.");
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Curtida removida.");
+        return resposta;
     }
 
     @DeleteMapping("/comentarios/{comentarioId}/usuarios/{usuarioId}")
@@ -94,6 +105,8 @@ public class CurtidaController {
             @PathVariable Long usuarioId
     ) {
         service.descurtirComentario(comentarioId, usuarioId);
-        return Map.of("mensagem", "Curtida removida.");
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Curtida removida.");
+        return resposta;
     }
 }

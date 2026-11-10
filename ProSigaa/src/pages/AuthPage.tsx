@@ -27,7 +27,7 @@ export function AuthPage({ initialMode = 'login' }: { initialMode?: AuthMode }) 
     setIsSubmitting(true)
     setErrorMessage('')
     try {
-      const endpoint = mode === 'login' ? '/usuarios/sessao' : '/usuarios'
+      const endpoint = mode === 'login' ? '/usuarios/login' : '/usuarios'
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -38,7 +38,7 @@ O endpoint de notificação de teste (`POST /api/test/notify`) é uma ferramenta
 - **Ator:** Usuário.
 - **Pré-condições:** usuário cadastrado.
 - **Fluxo principal:**
-  1. O cliente envia e-mail e senha para `POST /usuarios/sessao`.
+  1. O cliente envia e-mail e senha para `POST /usuarios/login`.
   2. O sistema valida as credenciais.
   3. O sistema responde `200 OK` com os dados públicos do usuário.
 - **Fluxos alternativos:**

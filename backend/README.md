@@ -85,7 +85,7 @@ As rotas canônicas usam recursos no plural. A tabela completa, payloads e respo
 | Método | Caminho | Função |
 |---|---|---|
 | POST / GET | `/usuarios` | Cadastrar / listar dados resumidos de usuários |
-| POST | `/usuarios/sessao` | Autenticar usuário |
+| POST | `/usuarios/login` | Autenticar usuário |
 | GET / POST | `/fases` | Consultar / cadastrar fases |
 | GET / POST | `/materias` | Consultar / cadastrar matérias |
 | GET / POST | `/postagens` | Consultar / publicar postagens |

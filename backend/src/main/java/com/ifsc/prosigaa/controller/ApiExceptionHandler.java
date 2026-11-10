@@ -12,12 +12,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
     private Map<String, Object> corpo(HttpStatus status, String mensagem) {
-        return Map.of("status", status.value(), "erro", status.getReasonPhrase(), "mensagem", mensagem, "timestamp", LocalDateTime.now().toString());
+        Map<String, Object> corpo = new LinkedHashMap<>();
+        corpo.put("status", status.value());
+        corpo.put("erro", status.getReasonPhrase());
+        corpo.put("mensagem", mensagem);
+        corpo.put("timestamp", LocalDateTime.now().toString());
+        return corpo;
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

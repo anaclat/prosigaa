@@ -30,7 +30,7 @@ O Swagger documenta os códigos de sucesso e erro e associa as respostas de erro
 |---|---|---|---|
 | POST | `/usuarios` | Cadastrar usuário | 201 |
 | GET | `/usuarios` | Listar dados públicos dos usuários | 200 |
-| POST | `/usuarios/sessao` | Autenticar usuário | 200 |
+| POST | `/usuarios/login` | Autenticar usuário | 200 |
 | GET | `/fases` | Listar fases e matérias | 200 |
 | POST | `/fases` | Cadastrar fase | 201 |
 | GET | `/materias?faseId={id}` | Listar/filtrar matérias | 200 |
@@ -61,7 +61,7 @@ O Swagger documenta os códigos de sucesso e erro e associa as respostas de erro
 
 Senha mínima de oito caracteres. A resposta não inclui senha nem hash.
 
-### Login — `POST /usuarios/sessao`
+### Login — `POST /usuarios/login`
 
 ```json
 { "email": "maria@ifsc.edu.br", "senha": "SenhaSegura123" }
@@ -87,7 +87,7 @@ Senha mínima de oito caracteres. A resposta não inclui senha nem hash.
 
 ## Compatibilidade
 
-As rotas antigas no singular (`/postagem`, `/fase`, `/materia`, `/usuario`) e os caminhos `/usuario/cadastro` e `/usuario/login` permanecem como aliases temporários. Novos clientes devem utilizar exclusivamente as rotas plurais desta documentação. O antigo formato de curtida com `usuarioId` na query string não é mantido: envie o identificador no corpo JSON.
+Não há aliases ativos no backend. Novos clientes devem utilizar exclusivamente as rotas plurais desta documentação: `/usuarios`, `/postagens`, `/fases`, `/materias` e `/curtidas`. O antigo formato de curtida com `usuarioId` na query string não é mantido: envie o identificador no corpo JSON.
 
 ## Segurança e limitações
 
