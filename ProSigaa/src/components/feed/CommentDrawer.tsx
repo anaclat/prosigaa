@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { ForumPost } from '../../interfaces/forum'
+import { getUserFacingError } from '../../services/api'
 
 interface CommentDrawerProps {
   post: ForumPost
@@ -48,7 +49,7 @@ export function CommentDrawer({ post, currentUserId, onClose, onSubmitComment, o
       setDraft('')
       inputRef.current?.focus()
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível enviar o comentário.')
+      setErrorMessage(getUserFacingError(error, 'Não foi possível enviar o comentário.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -62,7 +63,7 @@ export function CommentDrawer({ post, currentUserId, onClose, onSubmitComment, o
     try {
       await onLikeComment(commentId)
     } catch (error) {
-      setLikeError(error instanceof Error ? error.message : 'Não foi possível curtir o comentário.')
+      setLikeError(getUserFacingError(error, 'Não foi possível curtir o comentário.'))
     } finally {
       setLikingCommentIds((current) => current.filter((id) => id !== commentId))
     }
@@ -77,7 +78,7 @@ export function CommentDrawer({ post, currentUserId, onClose, onSubmitComment, o
     try {
       await onDeleteComment(commentId)
     } catch (error) {
-      setDeleteError(error instanceof Error ? error.message : 'Não foi possível excluir o comentário.')
+      setDeleteError(getUserFacingError(error, 'Não foi possível excluir o comentário.'))
       setDeletingCommentIds((current) => current.filter((id) => id !== commentId))
     }
   }

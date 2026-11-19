@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Header } from '../components/layout/Header'
-import { API_URL } from '../services/api'
+import { API_URL, getUserFacingError, readApiError } from '../services/api'
 import logo from '../assets/logo.png'
 
 type AuthMode = 'login' | 'register'
@@ -34,8 +34,7 @@ export function AuthPage({ initialMode = 'login' }: { initialMode?: AuthMode }) 
         body: JSON.stringify(payload),
       })
       if (!response.ok) {
-        const message = await response.text()
-        throw new Error(message || 'Não foi possível autenticar. Verifique seus dados e tente novamente.')
+        throw new Error(await readApiError(response, 'Não foi possível entrar. Verifique seu e-mail e sua senha.'))
       }
 
       const user = await response.json() as { id?: number; nome?: string }
@@ -45,7 +44,7 @@ export function AuthPage({ initialMode = 'login' }: { initialMode?: AuthMode }) 
       if (user.nome) window.localStorage.setItem('usuarioNome', user.nome)
       navigate('/feed', { replace: true })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível conectar ao servidor.')
+      setErrorMessage(getUserFacingError(error, 'Não foi possível entrar. Tente novamente.'))
     } finally {
       setIsSubmitting(false)
     }

@@ -1,5 +1,5 @@
 import type { BackendPostDTO, ForumMateria, ForumPhase, ForumPost } from '../interfaces/forum'
-import { API_URL } from './api'
+import { API_URL, readApiError } from './api'
 
 function normalizePost(post: BackendPostDTO): ForumPost {
   const category = post.tipo === 'DUVIDA' ? 'DUVIDA' : 'MATERIAL_ESTUDO'
@@ -45,7 +45,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
 export async function getForumPosts(): Promise<ForumPost[]> {
   const response = await fetch(`${API_URL}/postagens`)
   if (!response.ok) {
-    throw new Error((await response.text()) || 'Erro ao buscar postagens.')
+    throw new Error(await readApiError(response, 'Não foi possível carregar as postagens.'))
   }
   const payload = (await response.json()) as BackendPostDTO[]
   return payload.map(normalizePost)
@@ -54,7 +54,7 @@ export async function getForumPosts(): Promise<ForumPost[]> {
 export async function getForumPostById(postId: string): Promise<ForumPost | undefined> {
   const response = await fetch(`${API_URL}/postagens/${postId}`)
   if (!response.ok) {
-    throw new Error((await response.text()) || 'Postagem não encontrada.')
+    throw new Error(await readApiError(response, 'Não foi possível encontrar essa postagem.'))
   }
   const payload = (await response.json()) as BackendPostDTO
   return normalizePost(payload)
@@ -63,7 +63,7 @@ export async function getForumPostById(postId: string): Promise<ForumPost | unde
 export async function getFases(): Promise<ForumPhase[]> {
   const response = await fetch(`${API_URL}/fases`)
   if (!response.ok) {
-    throw new Error((await response.text()) || 'Erro ao buscar fases e matérias.')
+    throw new Error(await readApiError(response, 'Não foi possível carregar as fases e matérias.'))
   }
   const payload = (await response.json()) as { fases: ForumPhase[] }
   return payload.fases
@@ -74,7 +74,7 @@ export async function getMateriasByFase(faseId?: number): Promise<ForumMateria[]
 
   const response = await fetch(`${API_URL}/materias?faseId=${faseId}`)
   if (!response.ok) {
-    throw new Error((await response.text()) || 'Erro ao buscar matérias.')
+    throw new Error(await readApiError(response, 'Não foi possível carregar as matérias.'))
   }
   const payload = (await response.json()) as ForumMateria[]
   return payload
@@ -96,8 +96,7 @@ export async function createPost(payload: {
   })
 
   if (!response.ok) {
-    const text = await response.text()
-    throw new Error(text || 'Não foi possível criar a postagem.')
+    throw new Error(await readApiError(response, 'Não foi possível publicar. Tente novamente.'))
   }
 
   const data = (await response.json()) as BackendPostDTO
@@ -112,8 +111,7 @@ export async function createComment(postId: string | number, payload: { conteudo
   })
 
   if (!response.ok) {
-    const text = await response.text()
-    throw new Error(text || 'Não foi possível enviar a resposta.')
+    throw new Error(await readApiError(response, 'Não foi possível enviar sua resposta.'))
   }
 
   const data = (await response.json()) as BackendPostDTO
@@ -123,7 +121,7 @@ export async function createComment(postId: string | number, payload: { conteudo
 export async function deletePost(postId: string, userId: number): Promise<void> {
   const response = await fetch(`${API_URL}/postagens/${postId}?usuarioId=${encodeURIComponent(String(userId))}`, { method: 'DELETE' })
   if (!response.ok) {
-    throw new Error((await response.text()) || 'Não foi possível excluir a postagem.')
+    throw new Error(await readApiError(response, 'Não foi possível excluir a postagem.'))
   }
 }
 
@@ -133,7 +131,6 @@ export async function deleteComment(commentId: string, userId: number): Promise<
   })
 
   if (!response.ok) {
-    const text = await response.text()
-    throw new Error(text || 'Não foi possível excluir o comentário.')
+    throw new Error(await readApiError(response, 'Não foi possível excluir o comentário.'))
   }
 }

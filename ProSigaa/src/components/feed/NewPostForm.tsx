@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ForumMateria, ForumPhase } from '../../interfaces/forum'
+import { getUserFacingError } from '../../services/api'
 
 interface NewPostFormProps {
   phases: ForumPhase[]
   userId: number
+  selectedPhaseId: number | null
+  selectedMateriaId: number | null
   onSubmit: (payload: {
     titulo: string
     conteudo: string
@@ -15,12 +18,24 @@ interface NewPostFormProps {
   onCancel: () => void
 }
 
-export function NewPostForm({ phases, userId, onSubmit, onCancel }: NewPostFormProps) {
+export function NewPostForm({
+  phases,
+  userId,
+  selectedPhaseId,
+  selectedMateriaId,
+  onSubmit,
+  onCancel,
+}: NewPostFormProps) {
   const [titulo, setTitulo] = useState('')
   const [conteudo, setConteudo] = useState('')
   const [tipo, setTipo] = useState<'DUVIDA' | 'MATERIAL_ESTUDO'>('DUVIDA')
-  const [faseId, setFaseId] = useState<number>(0)
-  const [materiaId, setMateriaId] = useState<number>(0)
+  const [faseId, setFaseId] = useState<number>(selectedPhaseId ?? phases[0]?.id ?? 0)
+  const initialPhase = phases.find((phase) => phase.id === (selectedPhaseId ?? phases[0]?.id))
+  const [materiaId, setMateriaId] = useState<number>(
+    selectedMateriaId && initialPhase?.materias.some((materia) => materia.id === selectedMateriaId)
+      ? selectedMateriaId
+      : initialPhase?.materias[0]?.id ?? 0,
+  )
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -33,14 +48,19 @@ export function NewPostForm({ phases, userId, onSubmit, onCancel }: NewPostFormP
   const selectedPhase = useMemo(() => phases.find((phase) => phase.id === faseId), [faseId, phases])
 
   useEffect(() => {
-    setMateriaId(selectedPhase?.materias[0]?.id ?? 0)
-  }, [faseId, selectedPhase])
+    if (!selectedPhase?.materias.some((materia) => materia.id === materiaId)) {
+      setMateriaId(selectedPhase?.materias[0]?.id ?? 0)
+    }
+  }, [faseId, materiaId, selectedPhase])
 
   useEffect(() => {
-    if (phases.length > 0 && !faseId) {
-      setFaseId(phases[0].id)
+    if (phases.length > 0 && !phases.some((phase) => phase.id === faseId)) {
+      const initialPhaseId = phases.some((phase) => phase.id === selectedPhaseId)
+        ? selectedPhaseId
+        : phases[0].id
+      setFaseId(initialPhaseId ?? phases[0].id)
     }
-  }, [faseId, phases])
+  }, [faseId, phases, selectedPhaseId])
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -79,7 +99,7 @@ export function NewPostForm({ phases, userId, onSubmit, onCancel }: NewPostFormP
       setMateriaId(phases[0]?.materias?.[0]?.id ?? 0)
       onCancel()
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível publicar. Tente novamente.')
+      setErrorMessage(getUserFacingError(error, 'Não foi possível publicar. Tente novamente.'))
     } finally {
       setIsSubmitting(false)
     }

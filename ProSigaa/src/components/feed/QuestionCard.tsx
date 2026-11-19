@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { ForumPost } from '../../interfaces/forum'
+import { getUserFacingError } from '../../services/api'
 
 interface QuestionCardProps {
   post: ForumPost
@@ -12,6 +13,7 @@ interface QuestionCardProps {
 export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDelete }: QuestionCardProps) {
   const [isLiking, setIsLiking] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [likeError, setLikeError] = useState('')
   const [deleteError, setDeleteError] = useState('')
@@ -24,7 +26,7 @@ export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDe
     try {
       await onLike(post.id)
     } catch (error) {
-      setLikeError(error instanceof Error ? error.message : 'Não foi possível curtir a publicação.')
+      setLikeError(getUserFacingError(error, 'Não foi possível curtir a publicação.'))
     } finally {
       setIsLiking(false)
     }
@@ -39,7 +41,7 @@ export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDe
     try {
       await onDelete(post.id)
     } catch (error) {
-      setDeleteError(error instanceof Error ? error.message : 'Não foi possível excluir a postagem.')
+      setDeleteError(getUserFacingError(error, 'Não foi possível excluir a postagem.'))
       setIsDeleting(false)
     }
   }
@@ -79,11 +81,19 @@ export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDe
         )}
       </div>
 
-      <div className="question-title-link">
+      <button
+        type="button"
+        className="question-title-link"
+        aria-expanded={isExpanded}
+        aria-controls={`post-description-${post.id}`}
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+      >
         <h3>{post.title}</h3>
-      </div>
-
-      <p>{post.description}</p>
+        <p id={`post-description-${post.id}`} className={isExpanded ? '' : 'post-description-collapsed'}>
+          {post.description}
+        </p>
+        <span className="post-expand-label">{isExpanded ? 'Recolher publicação' : 'Expandir publicação'}</span>
+      </button>
 
       <div className="question-meta">
         <span>{post.author}</span>

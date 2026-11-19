@@ -120,7 +120,15 @@ export function LandingPage() {
   return (
     <div className="lp-page">
       <header className="lp-header">
-        <Link to="/" className="lp-brand" aria-label="ProSigaa, início" onClick={closeMenu}>
+        <Link
+          to="/feed"
+          className="lp-brand"
+          aria-label="Ir para o feed com todas as fases"
+          onClick={() => {
+            window.dispatchEvent(new Event('prosigaa:reset-feed-filters'))
+            closeMenu()
+          }}
+        >
           <img src={logo} alt="" />
         </Link>
 
@@ -257,7 +265,12 @@ export function LandingPage() {
       </main>
 
       <footer className="lp-footer" id="sobre">
-        <Link to="/" className="lp-brand lp-footer-brand" aria-label="ProSigaa, início">
+        <Link
+          to="/feed"
+          className="lp-brand lp-footer-brand"
+          aria-label="Ir para o feed com todas as fases"
+          onClick={() => window.dispatchEvent(new Event('prosigaa:reset-feed-filters'))}
+        >
           <img src={logo} alt="" />
         </Link>
         <p>Projeto acadêmico desenvolvido no IFSC.</p>

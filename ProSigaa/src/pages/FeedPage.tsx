@@ -6,6 +6,7 @@ import { QuestionCard } from '../components/feed/QuestionCard'
 import { Header } from '../components/layout/Header'
 import { getFases, getForumPosts, createComment, createPost, deleteComment, deletePost } from '../services/forumService'
 import { forgetLike, hasLikedContent, likeComment, likePost, rememberLike, unlikeComment, unlikePost } from '../services/likeService'
+import { getUserFacingError } from '../services/api'
 import type { ForumPhase, ForumPost } from '../interfaces/forum'
 
 export function FeedPage() {
@@ -24,6 +25,17 @@ export function FeedPage() {
   const closeComments = useCallback(() => setSelectedPostId(null), [])
 
   useEffect(() => {
+    const resetFeedFilters = () => {
+      setSelectedPhaseId(null)
+      setSelectedMateriaId(null)
+      setFilterType('ALL')
+    }
+
+    window.addEventListener('prosigaa:reset-feed-filters', resetFeedFilters)
+    return () => window.removeEventListener('prosigaa:reset-feed-filters', resetFeedFilters)
+  }, [])
+
+  useEffect(() => {
     Promise.all([getForumPosts(), getFases()])
       .then(([loadedPosts, loadedPhases]) => {
         const userId = Number(window.localStorage.getItem('usuarioId'))
@@ -38,7 +50,7 @@ export function FeedPage() {
         setPhases(loadedPhases)
       })
       .catch((error: unknown) => {
-        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar o fórum.')
+        setLoadError(getUserFacingError(error, 'Não foi possível carregar o fórum.'))
       })
       .finally(() => setIsLoading(false))
   }, [])
@@ -222,6 +234,8 @@ export function FeedPage() {
               <NewPostForm
                 phases={phases}
                 userId={currentUserId}
+                selectedPhaseId={selectedPhaseId}
+                selectedMateriaId={selectedMateriaId}
                 onSubmit={handleNewPost}
                 onCancel={() => setIsCreatingPost(false)}
               />

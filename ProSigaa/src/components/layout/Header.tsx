@@ -7,6 +7,8 @@ import { useNotifications } from '../../hooks/useNotifications'
 export function Header() {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const userId = Number(window.localStorage.getItem('usuarioId'))
+  const hasSession = Number.isSafeInteger(userId) && userId > 0
   const userName = window.localStorage.getItem('usuarioNome')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const {
@@ -39,13 +41,20 @@ export function Header() {
 
   return (
     <header className="site-header">
-      <Link to="/" className="brand-inline" aria-label="Página inicial">
+      <Link
+        to="/feed"
+        className="brand-inline"
+        aria-label="Ir para o feed com todas as fases"
+        onClick={() => window.dispatchEvent(new Event('prosigaa:reset-feed-filters'))}
+      >
         <img src={logo} alt="Logo ProSIGAA" className="h-10 w-auto brand-logo" />
       </Link>
 
-      <nav className="main-nav" aria-label="Navegação principal">
-        <Link to="/feed">Feed</Link>
-      </nav>
+      {hasSession && (
+        <nav className="main-nav" aria-label="Navegação principal">
+          <Link to="/feed">Feed</Link>
+        </nav>
+      )}
 
       <div className="header-actions">
         {userName ? (

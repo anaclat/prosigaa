@@ -1,4 +1,4 @@
-import { API_URL } from './api'
+import { API_URL, readApiError } from './api'
 
 async function sendLike(
   target: 'postagens' | 'comentarios',
@@ -26,8 +26,7 @@ async function sendLike(
       }
     : { method })
   if (!response.ok) {
-    const message = await response.text()
-    throw new Error(message || 'Não foi possível registrar a curtida.')
+    throw new Error(await readApiError(response, 'Não foi possível registrar sua curtida.'))
   }
 }
 
