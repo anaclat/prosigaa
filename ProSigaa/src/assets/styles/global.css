@@ -472,12 +472,12 @@ body[data-theme='dark'] .hero-copy h1 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
-  padding: 18px 0 22px;
+  padding: 12px 0 18px;
 }
 
 .feed-title-block h1 {
   margin: 0;
-  font-size: clamp(2.5rem, 4vw, 4.5rem);
+  font-size: clamp(2rem, 3vw, 3.2rem);
   letter-spacing: -0.08em;
 }
 
@@ -508,11 +508,11 @@ body[data-theme='dark'] .hero-copy h1 {
 
 .post-list {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .question-card {
-  padding: 18px 20px;
+  padding: 16px 18px;
 }
 
 .question-card.active {
@@ -1973,7 +1973,7 @@ body[data-theme='dark'] .lp-primary-button:hover {
 }
 
 .question-card {
-  padding: 22px;
+  padding: 16px 18px;
 }
 
 .question-card.active {
@@ -2250,6 +2250,190 @@ body[data-theme='dark'] .lp-primary-button:hover {
 
 .post-modal .form-actions {
   margin-top: 3px;
+}
+
+.attachment-field {
+  display: grid;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.attachment-heading,
+.selected-files-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attachment-heading {
+  justify-content: space-between;
+}
+
+.attachment-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.attachment-heading strong {
+  color: var(--text);
+}
+
+.attachment-heading small,
+.selected-files-list small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 400;
+}
+
+.file-picker-button {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--primary) !important;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.file-picker-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.file-picker-button:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.selected-files-list,
+.post-attachments ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.selected-files-list li {
+  min-width: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.selected-files-list li > span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-files-list li > small {
+  flex: 0 0 auto;
+}
+
+.selected-files-list button {
+  flex: 0 0 auto;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.post-options {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.post-options summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 650;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.post-options summary small {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.post-options-fields {
+  display: grid;
+  gap: 13px;
+  padding: 0 14px 14px;
+}
+
+.post-attachment-summary {
+  margin: 10px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.83rem;
+  cursor: pointer;
+}
+
+.post-attachments {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.post-attachments h4 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.post-attachments li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.post-attachments li > a:not(:has(img)) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.post-attachments img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.post-attachments small {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.75rem;
 }
 
 .auth-layout {

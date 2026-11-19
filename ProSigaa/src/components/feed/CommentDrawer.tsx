@@ -112,6 +112,26 @@ export function CommentDrawer({ post, currentUserId, onClose, onSubmitComment, o
               <span aria-hidden="true">·</span>
               <span>{post.time}</span>
             </div>
+            {post.attachments.length > 0 && (
+              <section className="post-attachments" aria-label="Arquivos anexados">
+                <h4>Arquivos ({post.attachments.length})</h4>
+                <ul>
+                  {post.attachments.map((attachment) => (
+                    <li key={attachment.id}>
+                      {attachment.contentType.startsWith('image/') && (
+                        <a href={attachment.url} target="_blank" rel="noreferrer" aria-label={`Visualizar ${attachment.name}`}>
+                          <img src={attachment.url} alt={attachment.name} loading="lazy" />
+                        </a>
+                      )}
+                      <a href={attachment.url} download={attachment.name}>
+                        {attachment.name}
+                      </a>
+                      <small>{(attachment.size / (1024 * 1024)).toFixed(1)} MB</small>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </article>
 
           <section className="drawer-comment-list" aria-label="Lista de comentários">

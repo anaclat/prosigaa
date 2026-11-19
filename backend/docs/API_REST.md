@@ -5,7 +5,7 @@ A especificação interativa está disponível em `/swagger-ui.html`; o document
 ## Convenções
 
 - Base local padrão: `http://localhost:8080`.
-- Requisições e respostas usam JSON, exceto respostas `204 No Content`.
+- Requisições e respostas usam JSON, exceto o cadastro multipart de postagens com anexos e respostas `204 No Content`.
 - Recursos canônicos no plural: `/usuarios`, `/postagens`, `/fases`, `/materias`, `/curtidas`.
 - Identificadores de ações de escrita são enviados no corpo JSON, nunca em query string.
 - `400`: entrada inválida/credenciais inválidas; `404`: recurso inexistente; `409`: conflito/integridade; `500`: erro inesperado.
@@ -38,6 +38,8 @@ O Swagger documenta os códigos de sucesso e erro e associa as respostas de erro
 | GET | `/postagens?faseId={id}&materiaId={id}` | Listar/filtrar postagens | 200 |
 | GET | `/postagens/{id}` | Consultar postagem | 200 |
 | POST | `/postagens` | Publicar postagem | 201 |
+| POST | `/postagens` (multipart/form-data) | Publicar postagem com anexos | 201 |
+| GET | `/postagens/anexos/{id}` | Visualizar imagem ou baixar PDF | 200 |
 | DELETE | `/postagens/{id}` | Excluir postagem | 204 |
 | POST | `/postagens/{id}/comentarios` | Comentar postagem | 201 |
 | DELETE | `/postagens/comentarios/{comentarioId}` | Excluir comentário | 204 |
@@ -83,6 +85,18 @@ O campo `anonima` é opcional e assume `false` quando omitido. Quando `true`, o 
   "anonima": true
 }
 ```
+
+### Publicar com arquivos — `POST /postagens` (`multipart/form-data`)
+
+Envie a parte `dados` como JSON e repita a parte `arquivos` para cada anexo. São aceitos PDF, PNG e JPG/JPEG, até 5 arquivos de 10 MB por publicação. Imagens podem ser visualizadas no navegador; PDFs são baixados. Os arquivos ficam em `backend/data/uploads` por padrão, configurável com `app.upload.dir` ou pela variável de ambiente `APP_UPLOAD_DIR`.
+
+```text
+dados: {"titulo":"Resumo de redes","conteudo":"Material para revisão.","tipo":"MATERIAL_ESTUDO","usuarioId":2,"faseId":1,"materiaId":3,"anonima":true}
+arquivos: resumo.pdf
+arquivos: diagrama.png
+```
+
+O DTO da postagem inclui a lista `anexos`, com nome, tipo, tamanho e URL. A API confere extensão e assinatura do conteúdo antes de salvar.
 
 ### Postagens curtidas — `GET /curtidas/postagens?usuarioId=2`
 

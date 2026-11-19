@@ -102,6 +102,17 @@ export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDe
         <span>{post.comments.length} respostas</span>
       </div>
 
+      {post.attachments.length > 0 && (
+        <button
+          type="button"
+          className="post-attachment-summary"
+          onClick={() => onOpenComments(post.id)}
+          aria-label={`Abrir ${post.attachments.length} arquivos anexados`}
+        >
+          {post.attachments.length} {post.attachments.length === 1 ? 'arquivo anexado' : 'arquivos anexados'}
+        </button>
+      )}
+
       <div className="question-actions">
         <button
           type="button"

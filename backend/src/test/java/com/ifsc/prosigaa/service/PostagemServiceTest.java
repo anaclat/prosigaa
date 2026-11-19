@@ -6,6 +6,7 @@ import com.ifsc.prosigaa.model.Fase;
 import com.ifsc.prosigaa.model.Materia;
 import com.ifsc.prosigaa.model.Postagem;
 import com.ifsc.prosigaa.model.Usuario;
+import com.ifsc.prosigaa.repository.AnexoPostagemRepository;
 import com.ifsc.prosigaa.repository.PostagemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class PostagemServiceTest {
     private PostagemRepository postagemRepository;
 
     @Mock
+    private AnexoPostagemRepository anexoRepository;
+
+    @Mock
     private UsuarioService usuarioService;
 
     @Mock
@@ -36,11 +40,16 @@ class PostagemServiceTest {
     @Mock
     private MateriaService materiaService;
 
+    @Mock
+    private ArquivoPostagemStorage arquivoStorage;
+
     private PostagemService postagemService;
 
     @BeforeEach
     void configurar() {
-        postagemService = new PostagemService(postagemRepository, usuarioService, faseService, materiaService);
+        postagemService = new PostagemService(
+                postagemRepository, anexoRepository, usuarioService, faseService, materiaService, arquivoStorage
+        );
     }
 
     @Test

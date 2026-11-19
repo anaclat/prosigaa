@@ -7,9 +7,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +55,10 @@ public class PostagemController {
     @ApiResponse(responseCode = "404", description = "Postagem não encontrada", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public PostagemDTO buscar(@PathVariable Long id) {
-        return postagemService.toDTO(postagemService.buscar(id));
+        return postagemService.buscarDTO(id);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     // POST cria uma postagem; repetir a mesma requisição pode gerar outra postagem.
     // O corpo traz autor e relações necessárias, já que o servidor não usa sessão de usuário.
@@ -60,6 +69,36 @@ public class PostagemController {
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public PostagemDTO cadastrar(@RequestBody CadastroPostagemDTO dto) {
         return postagemService.cadastrar(dto);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Criar postagem com anexos", description = "Aceita até 5 arquivos PDF, PNG ou JPG, com até 10 MB por arquivo.")
+    @ApiResponse(responseCode = "201", description = "Postagem criada")
+    @ApiResponse(responseCode = "400", description = "Dados ou arquivos inválidos", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    public PostagemDTO cadastrarComAnexos(
+            @RequestPart("dados") CadastroPostagemDTO dto,
+            @RequestPart(value = "arquivos", required = false) List<MultipartFile> arquivos) {
+        return postagemService.cadastrar(dto, arquivos);
+    }
+
+    @GetMapping("/anexos/{id}")
+    public ResponseEntity<Resource> baixarAnexo(@PathVariable Long id) throws IOException {
+        var anexo = postagemService.buscarAnexo(id);
+        boolean imagem = anexo.getTipoConteudo().startsWith("image/");
+        ContentDisposition disposicao = (imagem
+                ? ContentDisposition.inline()
+                : ContentDisposition.attachment())
+                .filename(anexo.getNomeOriginal(), StandardCharsets.UTF_8)
+                .build();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(anexo.getTipoConteudo()))
+                .contentLength(anexo.getTamanhoBytes())
+                .cacheControl(CacheControl.noCache())
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposicao.toString())
+                .header("X-Content-Type-Options", "nosniff")
+                .body(postagemService.carregarAnexo(anexo));
     }
 
     @PostMapping({"/{id}/comentarios", "/{id}/comentario"})
@@ -73,7 +112,7 @@ public class PostagemController {
     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
     public PostagemDTO comentar(@PathVariable Long id, @RequestBody CadastroComentarioDTO dto) {
         comentarioService.cadastrar(id, dto);
-        return postagemService.toDTO(postagemService.buscar(id));
+        return postagemService.buscarDTO(id);
     }
 
     @DeleteMapping("/{id}")

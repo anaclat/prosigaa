@@ -22,6 +22,7 @@ public record PostagemDTO(
         MateriaDTO materia,
         List<ComentarioDTO> comentarios,
         int curtidas,
-        boolean anonima
+        boolean anonima,
+        List<AnexoPostagemDTO> anexos
 ) {
 }

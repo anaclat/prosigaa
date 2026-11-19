@@ -78,6 +78,7 @@ export function FeedPage() {
     faseId: number
     materiaId: number
     anonima: boolean
+    arquivos: File[]
   }) => {
     const created = await createPost(payload)
     setPosts((current) => [created, ...current])

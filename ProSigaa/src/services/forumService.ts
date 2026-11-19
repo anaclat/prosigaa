@@ -1,4 +1,4 @@
-import type { BackendPostDTO, ForumMateria, ForumPhase, ForumPost } from '../interfaces/forum'
+import type { BackendPostDTO, ForumAttachment, ForumMateria, ForumPhase, ForumPost } from '../interfaces/forum'
 import { API_URL, readApiError } from './api'
 
 function normalizePost(post: BackendPostDTO): ForumPost {
@@ -39,6 +39,13 @@ function normalizePost(post: BackendPostDTO): ForumPost {
     subject: post.materia?.nome || 'Matéria',
     subjectId: post.materia?.id,
     liked: false,
+    attachments: (post.anexos || []).map((attachment): ForumAttachment => ({
+      id: String(attachment.id),
+      name: attachment.nome,
+      contentType: attachment.tipoConteudo,
+      size: attachment.tamanhoBytes,
+      url: `${API_URL}${attachment.url}`,
+    })),
   }
 }
 
@@ -89,12 +96,23 @@ export async function createPost(payload: {
   materiaId: number
   anonima: boolean
   urlImagem?: string | null
+  arquivos?: File[]
 }): Promise<ForumPost> {
-  const response = await fetch(`${API_URL}/postagens`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
+  const { arquivos = [], ...dados } = payload
+  let response: Response
+
+  if (arquivos.length > 0) {
+    const formData = new FormData()
+    formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
+    arquivos.forEach((arquivo) => formData.append('arquivos', arquivo))
+    response = await fetch(`${API_URL}/postagens`, { method: 'POST', body: formData })
+  } else {
+    response = await fetch(`${API_URL}/postagens`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados),
+    })
+  }
 
   if (!response.ok) {
     throw new Error(await readApiError(response, 'Não foi possível publicar. Tente novamente.'))

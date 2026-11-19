@@ -27,6 +27,14 @@ export interface ForumPhase {
   materias: ForumMateria[]
 }
 
+export interface ForumAttachment {
+  id: string
+  name: string
+  contentType: string
+  size: number
+  url: string
+}
+
 export interface ForumPost {
   id: string
   title: string
@@ -43,6 +51,7 @@ export interface ForumPost {
   subject: string
   subjectId?: number
   liked?: boolean
+  attachments: ForumAttachment[]
 }
 
 export interface ThemeContextValue {
@@ -85,4 +94,11 @@ export interface BackendPostDTO {
     }
   }>
   curtidas: number
+  anexos?: Array<{
+    id: number
+    nome: string
+    tipoConteudo: string
+    tamanhoBytes: number
+    url: string
+  }>
 }

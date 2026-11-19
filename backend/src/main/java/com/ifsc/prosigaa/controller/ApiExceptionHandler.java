@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,14 @@ public class ApiExceptionHandler {
     public ResponseEntity<Map<String, Object>> requisicaoInvalida(IllegalArgumentException e) {
         // 400 Bad Request: os dados recebidos não atendem às regras esperadas.
         return ResponseEntity.badRequest().body(corpo(HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, Object>> arquivoGrande(MaxUploadSizeExceededException e) {
+        return ResponseEntity.badRequest().body(corpo(
+                HttpStatus.BAD_REQUEST,
+                "Cada arquivo deve ter no máximo 10 MB e a requisição não pode ultrapassar o limite permitido."
+        ));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})

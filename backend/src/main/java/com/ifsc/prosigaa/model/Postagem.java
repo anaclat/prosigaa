@@ -45,6 +45,10 @@ public class Postagem {
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL)
     private List<CurtidaPostagem> curtidas = new ArrayList<>();
 
+    @BatchSize(size = 50)
+    @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AnexoPostagem> anexos = new ArrayList<>();
+
     protected Postagem() {
     }
 
@@ -112,6 +116,14 @@ public class Postagem {
 
     public List<CurtidaPostagem> getCurtidas() {
         return curtidas;
+    }
+
+    public List<AnexoPostagem> getAnexos() {
+        return anexos;
+    }
+
+    public void adicionarAnexo(AnexoPostagem anexo) {
+        anexos.add(anexo);
     }
 
     public void adicionarComentario(Comentario comentario) {
