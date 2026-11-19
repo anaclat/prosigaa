@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import { useTheme } from '../../hooks/useTheme'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -52,7 +52,8 @@ export function Header() {
 
       {hasSession && (
         <nav className="main-nav" aria-label="Navegação principal">
-          <Link to="/feed">Feed</Link>
+          <NavLink to="/feed" className={({ isActive }) => isActive ? 'active' : ''}>Feed</NavLink>
+          <NavLink to="/curtidas" className={({ isActive }) => isActive ? 'active' : ''}>Curtidas</NavLink>
         </nav>
       )}
 

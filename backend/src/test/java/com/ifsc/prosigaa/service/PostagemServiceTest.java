@@ -17,6 +17,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,5 +57,19 @@ class PostagemServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> postagemService.excluir(20L, 99L));
         verify(postagemRepository).findById(20L);
+    }
+
+    @Test
+    void deveOcultarNomeDoAutorEmPostagemAnonima() {
+        Usuario autor = new Usuario("Autor", "autor@aluno.ifsc.edu.br", "hash", TipoUsuario.ALUNO);
+        Fase fase = new Fase("Fase 1", 1);
+        Materia materia = new Materia("Matemática", "MAT");
+        Postagem postagem = new Postagem(
+                "Título", "Conteúdo", null, TipoPostagem.DUVIDA, autor, fase, materia, true
+        );
+
+        var dto = postagemService.toDTO(postagem);
+        assertEquals("Anônimo", dto.usuario().nome());
+        assertTrue(dto.anonima());
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.ifsc.prosigaa.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CurtidaService {
     private final CurtidaPostagemRepository curtidaPostagemRepository;
@@ -42,6 +44,11 @@ public class CurtidaService {
                     usuario.getNome()
             );
         }
+    }
+
+    public List<Long> listarPostagensCurtidas(Long usuarioId) {
+        usuarioService.buscar(usuarioId);
+        return curtidaPostagemRepository.findPostagemIdsByUsuarioId(usuarioId);
     }
 
     public void curtirComentario(Long comentarioId, Long usuarioId) {

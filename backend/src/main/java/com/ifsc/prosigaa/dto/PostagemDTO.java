@@ -21,6 +21,7 @@ public record PostagemDTO(
         FaseDTO fase,
         MateriaDTO materia,
         List<ComentarioDTO> comentarios,
-        int curtidas
+        int curtidas,
+        boolean anonima
 ) {
 }

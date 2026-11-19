@@ -11,6 +11,11 @@ public record CadastroPostagemDTO(
         @Schema(description = "Categoria da postagem", example = "DUVIDA", requiredMode = Schema.RequiredMode.REQUIRED) TipoPostagem tipo,
         @Schema(example = "1", requiredMode = Schema.RequiredMode.REQUIRED) Long usuarioId,
         @Schema(example = "1", requiredMode = Schema.RequiredMode.REQUIRED) Long faseId,
-        @Schema(example = "2", requiredMode = Schema.RequiredMode.REQUIRED) Long materiaId
+        @Schema(example = "2", requiredMode = Schema.RequiredMode.REQUIRED) Long materiaId,
+        @Schema(description = "Oculta o nome do autor na representação pública", example = "true") Boolean anonima
 ) {
+    public CadastroPostagemDTO(String titulo, String conteudo, String urlImagem, TipoPostagem tipo,
+                               Long usuarioId, Long faseId, Long materiaId) {
+        this(titulo, conteudo, urlImagem, tipo, usuarioId, faseId, materiaId, false);
+    }
 }

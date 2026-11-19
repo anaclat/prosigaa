@@ -21,6 +21,8 @@ public class Postagem {
 
     private String urlImagem;
 
+    private Boolean anonima;
+
     @Enumerated(EnumType.STRING)
     private TipoPostagem tipo;
 
@@ -48,9 +50,15 @@ public class Postagem {
 
     public Postagem(String titulo, String conteudo, String urlImagem, TipoPostagem tipo,
                     Usuario usuario, Fase fase, Materia materia) {
+        this(titulo, conteudo, urlImagem, tipo, usuario, fase, materia, false);
+    }
+
+    public Postagem(String titulo, String conteudo, String urlImagem, TipoPostagem tipo,
+                    Usuario usuario, Fase fase, Materia materia, Boolean anonima) {
         this.titulo = titulo;
         this.conteudo = conteudo;
         this.urlImagem = urlImagem;
+        this.anonima = Boolean.TRUE.equals(anonima);
         this.tipo = tipo;
         this.usuario = usuario;
         this.fase = fase;
@@ -72,6 +80,10 @@ public class Postagem {
 
     public String getUrlImagem() {
         return urlImagem;
+    }
+
+    public boolean isAnonima() {
+        return Boolean.TRUE.equals(anonima);
     }
 
     public TipoPostagem getTipo() {

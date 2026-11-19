@@ -55,6 +55,7 @@ export interface BackendPostDTO {
   titulo: string
   conteudo: string
   urlImagem: string | null
+  anonima: boolean
   tipo: 'DUVIDA' | 'MATERIAL_ESTUDO'
   criadoEm: string
   usuario: {

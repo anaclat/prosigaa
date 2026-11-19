@@ -23,12 +23,14 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WebMvcTest(PostagemController.class)
 class PostagemControllerTest {
@@ -77,6 +79,24 @@ class PostagemControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isCreated());
+    }
+
+    @Test
+    void deveReceberPreferenciaDePostagemAnonima() throws Exception {
+        CadastroPostagemDTO dto = new CadastroPostagemDTO(
+                "Título", "Conteúdo", null, TipoPostagem.DUVIDA, 1L, 1L, 1L, true
+        );
+        PostagemDTO dtoRetornoMock = Mockito.mock(PostagemDTO.class);
+        when(postagemService.cadastrar(any(CadastroPostagemDTO.class))).thenReturn(dtoRetornoMock);
+
+        mockMvc.perform(post("/postagens")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+
+        var captor = org.mockito.ArgumentCaptor.forClass(CadastroPostagemDTO.class);
+        verify(postagemService).cadastrar(captor.capture());
+        assertTrue(captor.getValue().anonima());
     }
 
     @Test

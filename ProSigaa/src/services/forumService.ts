@@ -9,7 +9,7 @@ function normalizePost(post: BackendPostDTO): ForumPost {
     title: post.titulo,
     category,
     description: post.conteudo,
-    author: post.usuario?.nome || 'Aluno',
+    author: post.anonima ? 'Anônimo' : post.usuario?.nome || 'Aluno',
     authorId: post.usuario?.id ? Number(post.usuario.id) : undefined,
     time: new Date(post.criadoEm).toLocaleString('pt-BR', {
       day: '2-digit',
@@ -87,6 +87,7 @@ export async function createPost(payload: {
   usuarioId: number
   faseId: number
   materiaId: number
+  anonima: boolean
   urlImagem?: string | null
 }): Promise<ForumPost> {
   const response = await fetch(`${API_URL}/postagens`, {

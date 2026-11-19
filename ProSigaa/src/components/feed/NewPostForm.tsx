@@ -14,6 +14,7 @@ interface NewPostFormProps {
     usuarioId: number
     faseId: number
     materiaId: number
+    anonima: boolean
   }) => Promise<void>
   onCancel: () => void
 }
@@ -90,6 +91,7 @@ export function NewPostForm({
         usuarioId: userId,
         faseId,
         materiaId,
+        anonima: isAnonymous,
       })
       setTitulo('')
       setConteudo('')
@@ -192,7 +194,7 @@ export function NewPostForm({
             />
             <span>
               <strong>Postar como anônimo</strong>
-              <small>A API atual ainda não salva essa preferência.</small>
+              <small>Seu nome não será exibido nesta publicação.</small>
             </span>
           </label>
 

@@ -35,7 +35,7 @@ public class PostagemService {
 
         Postagem postagem = new Postagem(
                 dto.titulo(), dto.conteudo(), dto.urlImagem(),
-                dto.tipo(), usuario, fase, materia
+                dto.tipo(), usuario, fase, materia, dto.anonima()
         );
 
         return toDTO(postagemRepository.save(postagem));
@@ -66,7 +66,9 @@ public class PostagemService {
         FaseDTO fase = new FaseDTO(p.getFase().getId(), p.getFase().getNome(), p.getFase().getNumero(), List.of());
         MateriaDTO materia = new MateriaDTO(p.getMateria().getId(), p.getMateria().getNome(), p.getMateria().getCodigo());
         UsuarioResumoDTO usuario = new UsuarioResumoDTO(
-                p.getUsuario().getId(), p.getUsuario().getNome(), p.getUsuario().getTipo()
+                p.getUsuario().getId(),
+                p.isAnonima() ? "Anônimo" : p.getUsuario().getNome(),
+                p.getUsuario().getTipo()
         );
 
         List<ComentarioDTO> comentarios = p.getComentarios().stream()
@@ -80,7 +82,7 @@ public class PostagemService {
         return new PostagemDTO(
                 p.getId(), p.getTitulo(), p.getConteudo(), p.getUrlImagem(),
                 p.getTipo(), p.getCriadoEm(), usuario, fase, materia,
-                comentarios, p.getCurtidas().size()
+                comentarios, p.getCurtidas().size(), p.isAnonima()
         );
     }
 

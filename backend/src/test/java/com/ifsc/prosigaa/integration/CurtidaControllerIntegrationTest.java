@@ -19,7 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -63,6 +65,18 @@ class CurtidaControllerIntegrationTest {
                 .andExpect(status().isOk());
 
         assertFalse(curtidaPostagemRepository.existsById(curtida.getId()));
+    }
+
+    @Test
+    void deveListarPostagensCurtidasPeloUsuario() throws Exception {
+        Usuario usuario = usuarioRepository.findByEmail("aluno@ifsc.edu.br").orElseThrow();
+        Postagem postagem = postagemRepository.findAll().get(0);
+        curtidaPostagemRepository.save(new CurtidaPostagem(usuario, postagem));
+
+        mockMvc.perform(get("/curtidas/postagens").param("usuarioId", usuario.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").value(postagem.getId()));
     }
 
     @Test

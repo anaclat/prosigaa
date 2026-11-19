@@ -41,6 +41,7 @@ O Swagger documenta os códigos de sucesso e erro e associa as respostas de erro
 | DELETE | `/postagens/{id}` | Excluir postagem | 204 |
 | POST | `/postagens/{id}/comentarios` | Comentar postagem | 201 |
 | DELETE | `/postagens/comentarios/{comentarioId}` | Excluir comentário | 204 |
+| GET | `/curtidas/postagens?usuarioId={id}` | Listar IDs das postagens curtidas pelo usuário | 200 |
 | POST | `/curtidas/postagens/{postagemId}` | Curtir postagem | 201 |
 | DELETE | `/curtidas/postagens/{postagemId}` | Remover curtida da postagem | 200 |
 | POST | `/curtidas/comentarios/{comentarioId}` | Curtir comentário | 201 |
@@ -65,6 +66,28 @@ Senha mínima de oito caracteres. A resposta não inclui senha nem hash.
 
 ```json
 { "email": "maria@ifsc.edu.br", "senha": "SenhaSegura123" }
+```
+
+### Publicar anonimamente — `POST /postagens`
+
+O campo `anonima` é opcional e assume `false` quando omitido. Quando `true`, o nome público do autor é exibido como “Anônimo”.
+
+```json
+{
+  "titulo": "Resumo de redes",
+  "conteudo": "Material para revisão.",
+  "tipo": "MATERIAL_ESTUDO",
+  "usuarioId": 2,
+  "faseId": 1,
+  "materiaId": 3,
+  "anonima": true
+}
+```
+
+### Postagens curtidas — `GET /curtidas/postagens?usuarioId=2`
+
+```json
+[10, 14]
 ```
 
 ### Curtir — `POST /curtidas/postagens/10`

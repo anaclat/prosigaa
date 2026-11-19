@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { CommentDrawer } from '../components/feed/CommentDrawer'
 import { FiltersSidebar } from '../components/feed/FiltersSidebar'
 import { NewPostForm } from '../components/feed/NewPostForm'
 import { QuestionCard } from '../components/feed/QuestionCard'
 import { Header } from '../components/layout/Header'
 import { getFases, getForumPosts, createComment, createPost, deleteComment, deletePost } from '../services/forumService'
-import { forgetLike, hasLikedContent, likeComment, likePost, rememberLike, unlikeComment, unlikePost } from '../services/likeService'
+import { forgetLike, getLikedPostIds, hasLikedContent, likeComment, likePost, rememberLike, unlikeComment, unlikePost } from '../services/likeService'
 import { getUserFacingError } from '../services/api'
 import type { ForumPhase, ForumPost } from '../interfaces/forum'
 
 export function FeedPage() {
+  const isLikesPage = useLocation().pathname === '/curtidas'
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [phases, setPhases] = useState<ForumPhase[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -36,12 +38,14 @@ export function FeedPage() {
   }, [])
 
   useEffect(() => {
-    Promise.all([getForumPosts(), getFases()])
-      .then(([loadedPosts, loadedPhases]) => {
+    const userId = Number(window.localStorage.getItem('usuarioId'))
+    Promise.all([getForumPosts(), getFases(), getLikedPostIds(userId)])
+      .then(([loadedPosts, loadedPhases, likedPostIds]) => {
+        const likedPosts = new Set(likedPostIds)
         const userId = Number(window.localStorage.getItem('usuarioId'))
         setPosts(loadedPosts.map((post) => ({
           ...post,
-          liked: hasLikedContent(userId, 'postagem', post.id),
+          liked: likedPosts.has(post.id),
           comments: post.comments.map((comment) => ({
             ...comment,
             liked: hasLikedContent(userId, 'comentario', comment.id),
@@ -56,13 +60,15 @@ export function FeedPage() {
   }, [])
 
   const visiblePosts = useMemo(() => {
+    if (isLikesPage) return posts.filter((post) => post.liked)
+
     return posts.filter((post) => {
       const phaseMatch = selectedPhaseId === null || post.phaseId === selectedPhaseId
       const subjectMatch = selectedMateriaId === null || post.subjectId === selectedMateriaId
       const typeMatch = filterType === 'ALL' || post.category === filterType
       return phaseMatch && subjectMatch && typeMatch
     })
-  }, [filterType, posts, selectedMateriaId, selectedPhaseId])
+  }, [filterType, isLikesPage, posts, selectedMateriaId, selectedPhaseId])
 
   const handleNewPost = async (payload: {
     titulo: string
@@ -71,6 +77,7 @@ export function FeedPage() {
     usuarioId: number
     faseId: number
     materiaId: number
+    anonima: boolean
   }) => {
     const created = await createPost(payload)
     setPosts((current) => [created, ...current])
@@ -109,7 +116,6 @@ export function FeedPage() {
     }
 
     await deletePost(postId, currentUserId)
-    forgetLike(currentUserId, 'postagem', postId)
     post.comments.forEach((comment) => forgetLike(currentUserId, 'comentario', comment.id))
     setPosts((current) => current.filter((item) => item.id !== postId))
     if (selectedPostId === postId) closeComments()
@@ -143,10 +149,8 @@ export function FeedPage() {
     try {
       if (wasLiked) {
         await unlikePost(postId, currentUserId)
-        forgetLike(currentUserId, 'postagem', postId)
       } else {
         await likePost(postId, currentUserId)
-        rememberLike(currentUserId, 'postagem', postId)
       }
     } catch (error) {
       setPosts((current) => current.map((item) => item.id === postId
@@ -199,8 +203,8 @@ export function FeedPage() {
     <div className="feed-page-shell">
       <Header />
 
-      <main className="feed-layout">
-        <div className="feed-left-column">
+      <main className={`feed-layout${isLikesPage ? ' likes-view' : ''}`}>
+        {!isLikesPage && <div className="feed-left-column">
           <FiltersSidebar
             phases={phases}
             selectedPhaseId={selectedPhaseId}
@@ -215,18 +219,20 @@ export function FeedPage() {
             }}
             onFilterTypeChange={setFilterType}
           />
-        </div>
+        </div>}
 
         <div className="feed-center-column">
           <div className="feed-toolbar">
             <div className="feed-title-block">
-              <h1>Sua turma, suas dúvidas.</h1>
+              <h1>{isLikesPage ? 'Publicações curtidas' : 'Sua turma, suas dúvidas.'}</h1>
             </div>
-            <div className="toolbar-actions">
-              <button type="button" className="primary-button small" onClick={() => setIsCreatingPost(true)}>
-                Nova postagem
-              </button>
-            </div>
+            {!isLikesPage && (
+              <div className="toolbar-actions">
+                <button type="button" className="primary-button small" onClick={() => setIsCreatingPost(true)}>
+                  Nova postagem
+                </button>
+              </div>
+            )}
           </div>
 
           {isCreatingPost && (
@@ -250,7 +256,11 @@ export function FeedPage() {
             ) : isLoading ? (
               <div className="empty-state">Carregando o fórum...</div>
             ) : visiblePosts.length === 0 ? (
-              <div className="empty-state">Nenhuma conversa encontrada para os filtros selecionados.</div>
+              <div className="empty-state">
+                {isLikesPage
+                  ? 'Você ainda não curtiu nenhuma publicação.'
+                  : 'Nenhuma conversa encontrada para os filtros selecionados.'}
+              </div>
             ) : (
               visiblePosts.map((post) => (
                 <QuestionCard

@@ -13,7 +13,6 @@ interface QuestionCardProps {
 export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDelete }: QuestionCardProps) {
   const [isLiking, setIsLiking] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [likeError, setLikeError] = useState('')
   const [deleteError, setDeleteError] = useState('')
@@ -84,15 +83,15 @@ export function QuestionCard({ post, currentUserId, onOpenComments, onLike, onDe
       <button
         type="button"
         className="question-title-link"
-        aria-expanded={isExpanded}
-        aria-controls={`post-description-${post.id}`}
-        onClick={() => setIsExpanded((expanded) => !expanded)}
+        aria-haspopup="dialog"
+        aria-label={`Abrir publicação ${post.title} e visualizar comentários`}
+        onClick={() => onOpenComments(post.id)}
       >
-        <h3>{post.title}</h3>
-        <p id={`post-description-${post.id}`} className={isExpanded ? '' : 'post-description-collapsed'}>
+        <span className="question-card-heading">{post.title}</span>
+        <span className="post-description-collapsed">
           {post.description}
-        </p>
-        <span className="post-expand-label">{isExpanded ? 'Recolher publicação' : 'Expandir publicação'}</span>
+        </span>
+        <span className="post-expand-label">Ver publicação e comentários</span>
       </button>
 
       <div className="question-meta">

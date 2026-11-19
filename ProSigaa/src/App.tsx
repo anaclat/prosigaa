@@ -24,6 +24,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={hasSession() ? <Navigate to="/feed" replace /> : <AuthPage />} />
         <Route path="/feed" element={<RequireAuth><FeedPage /></RequireAuth>} />
+        <Route path="/curtidas" element={<RequireAuth><FeedPage /></RequireAuth>} />
         <Route path="/comentarios/:postId" element={<RequireAuth><CommentsPage /></RequireAuth>} />
         <Route path="/cadastro" element={hasSession() ? <Navigate to="/feed" replace /> : <AuthPage initialMode="register" />} />
         <Route path="*" element={<Navigate to="/" replace />} />

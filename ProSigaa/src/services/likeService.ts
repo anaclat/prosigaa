@@ -46,6 +46,20 @@ export function unlikeComment(commentId: string, userId: number): Promise<void> 
   return sendLike('comentarios', commentId, userId, 'DELETE')
 }
 
+export async function getLikedPostIds(userId: number): Promise<string[]> {
+  if (!Number.isSafeInteger(userId) || userId <= 0) {
+    throw new Error('Sua sessão expirou. Entre novamente para ver suas curtidas.')
+  }
+
+  const response = await fetch(`${API_URL}/curtidas/postagens?usuarioId=${encodeURIComponent(String(userId))}`)
+  if (!response.ok) {
+    throw new Error(await readApiError(response, 'Não foi possível carregar suas postagens curtidas.'))
+  }
+
+  const postIds = await response.json() as number[]
+  return postIds.map(String)
+}
+
 export function hasLikedContent(userId: number, target: 'postagem' | 'comentario', contentId: string): boolean {
   return window.localStorage.getItem(`prosigaa:curtida:${userId}:${target}:${contentId}`) === 'true'
 }

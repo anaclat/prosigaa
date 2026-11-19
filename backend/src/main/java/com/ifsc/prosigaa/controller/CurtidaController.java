@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,6 +24,14 @@ public class CurtidaController {
 
     public CurtidaController(CurtidaService service) {
         this.service = service;
+    }
+
+    @GetMapping("/postagens")
+    @Operation(summary = "Listar postagens curtidas", description = "Retorna os identificadores das postagens curtidas pelo usuário.")
+    @ApiResponse(responseCode = "200", description = "Identificadores encontrados")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = ApiErrorDTO.class)))
+    public List<Long> listarPostagensCurtidas(@RequestParam Long usuarioId) {
+        return service.listarPostagensCurtidas(usuarioId);
     }
 
     @PostMapping("/postagens/{postagemId}")

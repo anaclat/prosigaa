@@ -96,7 +96,7 @@ export function CommentDrawer({ post, currentUserId, onClose, onSubmitComment, o
         <header className="comment-drawer-header">
           <div>
             <span className="card-label">{post.categoryLabel}</span>
-            <h2 id="comment-drawer-title">Comentários</h2>
+            <h2 id="comment-drawer-title">Publicação e comentários</h2>
           </div>
           <button type="button" className="drawer-close-button" onClick={onClose} aria-label="Fechar comentários">
             <span aria-hidden="true">×</span>
