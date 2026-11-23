@@ -2,9 +2,16 @@ package com.ifsc.prosigaa.service;
 
 import com.ifsc.prosigaa.dto.NotificacaoDTO;
 import com.ifsc.prosigaa.enums.TipoNotificacao;
+import com.ifsc.prosigaa.service.ComentarioService.NovoComentarioEvent;
+import com.ifsc.prosigaa.service.CurtidaService.CurtidaComentarioEvent;
+import com.ifsc.prosigaa.service.CurtidaService.CurtidaPostagemEvent;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +30,25 @@ public class NotificacaoService {
         // O destino permite ao cliente assinar notificações do usuário; ele não é uma rota REST.
         messagingTemplate.convertAndSend(
                 "/topic/usuarios/" + usuarioId + "/notifications",
-                notification
-        );
+                notification);
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onNovoComentario(NovoComentarioEvent event) {
+        notificarNovoComentario(event.autorPostagemId(), event.postagemId(), event.nomeAutorComentario());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onCurtidaPostagem(CurtidaPostagemEvent event) {
+        notificarCurtidaPostagem(event.autorPostagemId(), event.postagemId(), event.nomeUsuario());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onCurtidaComentario(CurtidaComentarioEvent event) {
+        notificarCurtidaComentario(event.autorComentarioId(), event.comentarioId(), event.nomeUsuario());
     }
 
     public void notificarNovoComentario(Long autorPostagemId, Long postagemId, String nomeAutorComentario) {
@@ -38,8 +62,7 @@ public class NotificacaoService {
                 TipoNotificacao.COMENTARIO,
                 postagemId,
                 nomeAutorComentario,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         enviarParaUsuario(autorPostagemId, notification);
     }
@@ -55,8 +78,7 @@ public class NotificacaoService {
                 TipoNotificacao.CURTIDA,
                 postagemId,
                 nomeUsuario,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         enviarParaUsuario(autorPostagemId, notification);
     }
@@ -72,8 +94,7 @@ public class NotificacaoService {
                 TipoNotificacao.CURTIDA,
                 comentarioId,
                 nomeUsuario,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         enviarParaUsuario(autorComentarioId, notification);
     }

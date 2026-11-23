@@ -5,45 +5,47 @@ import com.ifsc.prosigaa.model.Comentario;
 import com.ifsc.prosigaa.model.Postagem;
 import com.ifsc.prosigaa.model.Usuario;
 import com.ifsc.prosigaa.repository.ComentarioRepository;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ComentarioService {
     private final ComentarioRepository comentarioRepository;
     private final UsuarioService usuarioService;
     private final PostagemService postagemService;
-    private final NotificacaoService notificacaoService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ComentarioService(ComentarioRepository comentarioRepository,
-                             UsuarioService usuarioService,
-                             PostagemService postagemService,
-                             NotificacaoService notificacaoService) {
+            UsuarioService usuarioService,
+            PostagemService postagemService,
+            ApplicationEventPublisher eventPublisher) {
         this.comentarioRepository = comentarioRepository;
         this.usuarioService = usuarioService;
         this.postagemService = postagemService;
-        this.notificacaoService = notificacaoService;
+        this.eventPublisher = eventPublisher;
     }
 
-    public Comentario cadastrar(Long postagemId, CadastroComentarioDTO dto) {
-        if (dto.conteudo() == null || dto.conteudo().isBlank()) {
-            throw new IllegalArgumentException("Comentário não pode ser vazio.");
-        }
+    public record NovoComentarioEvent(Long autorPostagemId, Long postagemId, String nomeAutorComentario) {
+    }
 
+    @Transactional
+    public Comentario cadastrar(Long postagemId, CadastroComentarioDTO dto) {
         Usuario usuario = usuarioService.buscar(dto.usuarioId());
         Postagem postagem = postagemService.buscar(postagemId);
 
         Comentario comentario = new Comentario(dto.conteudo(), usuario, postagem);
+
         postagem.adicionarComentario(comentario);
+
         comentarioRepository.save(comentario);
 
         if (!postagem.getUsuario().getId().equals(usuario.getId())) {
-            notificacaoService.notificarNovoComentario(
-                    postagem.getUsuario().getId(),
-                    postagem.getId(),
-                    usuario.getNome()
-            );
+            // Apenas publica o evento; não faz I/O de rede aqui
+            eventPublisher.publishEvent(new NovoComentarioEvent(
+                    postagem.getUsuario().getId(), postagem.getId(), usuario.getNome()));
         }
-
         return comentario;
     }
 
@@ -53,7 +55,8 @@ public class ComentarioService {
         }
 
         Comentario comentario = comentarioRepository.findById(comentarioId)
-                .orElseThrow(() -> new com.ifsc.prosigaa.exception.ResourceNotFoundException("Comentário não encontrado."));
+                .orElseThrow(
+                        () -> new com.ifsc.prosigaa.exception.ResourceNotFoundException("Comentário não encontrado."));
 
         if (!comentario.getUsuario().getId().equals(usuarioId)) {
             throw new IllegalArgumentException("Você só pode excluir seus próprios comentários.");
