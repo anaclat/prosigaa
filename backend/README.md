@@ -10,7 +10,7 @@ Backend REST do ProSIGAA, uma aplicação acadêmica para estudantes e professor
 - Spring Web (REST)
 - Spring Data JPA / Hibernate
 - Spring Security Crypto (BCrypt para hashes de senha)
-- Spring Security Crypto (BCrypt para hashes de senha)
+- Spring Security OAuth2 Client (login Google)
 - H2 (banco relacional em arquivo)
 - springdoc-openapi / Swagger UI
 - Spring WebSocket
@@ -51,6 +51,19 @@ No modo container único, a API fica disponível via proxy em `/api`:
 - `http://localhost:3000/api/swagger-ui.html`
 
 A API fica em `http://localhost:8080`. A documentação interativa fica em `http://localhost:8080/swagger-ui.html` e o documento OpenAPI JSON em `http://localhost:8080/v3/api-docs`.
+
+### Login com Google
+
+Configure um cliente OAuth do tipo aplicação Web no Google Cloud. Para desenvolvimento local, use como URI de redirecionamento autorizada `http://localhost:8080/login/oauth2/code/google`. Defina as credenciais antes de iniciar o backend:
+
+```bash
+export SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID="seu-client-id"
+export SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET="seu-client-secret"
+```
+
+O frontend inicia o fluxo em `/oauth2/authorization/google`. Após o login, o backend redireciona para `http://localhost:5173/oauth2/callback`; configure outro destino com `APP_OAUTH2_SUCCESS_URL` em produção. Somente contas Google com e-mail verificado nos domínios institucionais aceitos pela API podem entrar. Uma conta local com o mesmo e-mail é reutilizada, e uma conta nova é criada como aluno.
+
+O endpoint existente `POST /usuarios/login` permanece inalterado.
 
 O banco de desenvolvimento é criado no diretório `data/` e mantém os dados entre reinicializações. O console H2 está disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:./data/prosigaa`, usuário `sa`, senha vazia). Não exponha o console H2 em produção.
 

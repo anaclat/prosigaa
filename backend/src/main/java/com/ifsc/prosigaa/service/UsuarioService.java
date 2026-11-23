@@ -10,6 +10,7 @@ import com.ifsc.prosigaa.exception.ResourceNotFoundException;
 import com.ifsc.prosigaa.exception.ConflictException;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UsuarioService {
@@ -47,6 +48,21 @@ public class UsuarioService {
             usuario.atualizarSenhaHash(passwordEncoder.encode(senha));
             usuarioRepository.save(usuario);
         }
+        return toDTO(usuario);
+    }
+
+    /** Resolve a conta local para uma identidade Google previamente validada. */
+    public UsuarioDTO loginGoogle(String nome, String email) {
+        String emailNormalizado = email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+        validarEmail(emailNormalizado);
+        Usuario usuario = usuarioRepository.findByEmail(emailNormalizado).orElseGet(() ->
+                usuarioRepository.save(new Usuario(
+                        nome == null || nome.isBlank() ? emailNormalizado : nome,
+                        emailNormalizado,
+                        null,
+                        TipoUsuario.ALUNO
+                ))
+        );
         return toDTO(usuario);
     }
 
